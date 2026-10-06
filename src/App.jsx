@@ -6,7 +6,11 @@ import Home from './pages/Home';
 import NuevoReporte from './pages/NuevoReporte';
 import MisReportes from './pages/MisReportes';
 import MiCuenta from './pages/MiCuenta';
-import InfoUtil from './pages/InfoUtil'; // <-- Acá está el import
+import InfoUtil from './pages/InfoUtil';
+
+// 1. Importamos las páginas de acceso
+import Login from './pages/Login';
+import Registro from './pages/Registro';
 
 import './styles/main.scss';
 
@@ -20,7 +24,11 @@ function App() {
                     <Route path="/reporte" element={<NuevoReporte />} />
                     <Route path="/mis-reportes" element={<MisReportes />} />
                     <Route path="/cuenta" element={<MiCuenta />} />
-                    <Route path="/info" element={<InfoUtil />} /> {/* <-- Acá está la ruta */}
+                    <Route path="/info" element={<InfoUtil />} />
+
+                    {/* 2. Agregamos las rutas */}
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/registro" element={<Registro />} />
                 </Routes>
             </main>
             <BottomNav />

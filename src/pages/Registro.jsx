@@ -1,0 +1,108 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Icon from '../components/Icon';
+
+const Registro = () => {
+    const navigate = useNavigate();
+    const [datos, setDatos] = useState({
+        nombre: '',
+        apellido: '',
+        documento: '',
+        fechaNacimiento: '',
+        email: '',
+        telefono: '',
+        password: '',
+        repetirPassword: ''
+    });
+
+    const handleChange = (e) => {
+        setDatos({ ...datos, [e.target.name]: e.target.value });
+    };
+
+    const handleRegistro = (e) => {
+        e.preventDefault();
+        if (datos.password !== datos.repetirPassword) {
+            alert('Las contraseñas no coinciden. Por favor, verificalas.');
+            return;
+        }
+
+        // Armamos el objeto final sin la clave repetida
+        const { repetirPassword, ...datosParaEnviar } = datos;
+        console.log("Datos para registrar:", datosParaEnviar);
+
+        alert('¡Cuenta creada con éxito! Ya podés iniciar sesión.');
+        navigate('/login'); // Lo mandamos a loguearse
+    };
+
+    return (
+        <div className="page-wrap" style={{ maxWidth: '600px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                <h1 className="page-title" style={{ marginBottom: '.5rem' }}>Crear Cuenta</h1>
+                <p style={{ color: 'var(--texto-3)', fontSize: '.9rem' }}>Completá tus datos para sumarte a Conectar Laboulaye</p>
+            </div>
+
+            <div className="card-box">
+                <form onSubmit={handleRegistro}>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0 1rem' }}>
+                        <div className="field">
+                            <label htmlFor="nombre">Nombre</label>
+                            <input type="text" id="nombre" name="nombre" value={datos.nombre} onChange={handleChange} required />
+                        </div>
+                        <div className="field">
+                            <label htmlFor="apellido">Apellido</label>
+                            <input type="text" id="apellido" name="apellido" value={datos.apellido} onChange={handleChange} required />
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0 1rem' }}>
+                        <div className="field">
+                            <label htmlFor="documento">Documento (DNI)</label>
+                            <input type="number" id="documento" name="documento" value={datos.documento} onChange={handleChange} required />
+                        </div>
+                        <div className="field">
+                            <label htmlFor="fechaNacimiento">Fecha de nacimiento</label>
+                            <input type="date" id="fechaNacimiento" name="fechaNacimiento" value={datos.fechaNacimiento} onChange={handleChange} required />
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0 1rem' }}>
+                        <div className="field">
+                            <label htmlFor="email">Correo electrónico</label>
+                            <input type="email" id="email" name="email" value={datos.email} onChange={handleChange} required />
+                        </div>
+                        <div className="field">
+                            <label htmlFor="telefono">Teléfono</label>
+                            <input type="tel" id="telefono" name="telefono" value={datos.telefono} onChange={handleChange} required />
+                        </div>
+                    </div>
+
+                    <div style={{ borderTop: '1px solid var(--borde)', margin: '1rem 0 1.5rem', paddingTop: '1rem' }}>
+                        <h3 style={{ fontSize: '1rem', marginBottom: '1rem' }}>Seguridad</h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0 1rem' }}>
+                            <div className="field">
+                                <label htmlFor="password">Contraseña</label>
+                                <input type="password" id="password" name="password" value={datos.password} onChange={handleChange} required minLength="6" />
+                            </div>
+                            <div className="field">
+                                <label htmlFor="repetirPassword">Repetir contraseña</label>
+                                <input type="password" id="repetirPassword" name="repetirPassword" value={datos.repetirPassword} onChange={handleChange} required minLength="6" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" className="btn btn-primary btn-block">
+                        Registrarme
+                    </button>
+                </form>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '.9rem' }}>
+                <span style={{ color: 'var(--texto-2)' }}>¿Ya tenés una cuenta? </span>
+                <Link to="/login" style={{ color: 'var(--brand-1)', fontWeight: '600' }}>Iniciá sesión</Link>
+            </div>
+        </div>
+    );
+};
+
+export default Registro;

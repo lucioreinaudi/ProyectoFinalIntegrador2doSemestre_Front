@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import Icon from './Icon';
 
 const TopBar = () => {
+    // Cambiá a 'true' para ver cómo se ve con la sesión iniciada
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const nombreUsuario = "Joaquín";
+
     return (
         <header className="topbar">
             <div className="topbar-inner">
@@ -41,8 +45,7 @@ const TopBar = () => {
                     </NavLink>
                 </nav>
 
-
-                {/* ACCIONES RAPIDAS (Tema, Accesibilidad, Notificaciones) */}
+                {/* ACCIONES RAPIDAS */}
                 <div className="topbar-actions">
                     <button className="icon-btn" title="Cambiar tema">
                         <Icon name="moon" />
@@ -54,13 +57,31 @@ const TopBar = () => {
                         <Icon name="bell" />
                         <span className="badge-dot">3</span>
                     </button>
-                    <Link to="/cuenta" className="icon-btn" title="Mi cuenta">
-                        <Icon name="user" />
-                    </Link>
+
+                    {/* LÓGICA DE INGRESO / USUARIO LOGUEADO */}
+                    <div style={{ display: 'flex', alignItems: 'center', marginLeft: '0.5rem', paddingLeft: '0.5rem', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
+                        {isLoggedIn ? (
+                            <Link to="/cuenta" className="icon-btn wide" title="Mi cuenta" style={{ textDecoration: 'none' }}>
+                                <Icon name="user" />
+                                <span className="a11y-label" style={{ display: 'inline-block', marginLeft: '0.3rem', fontWeight: '600' }}>
+                                    Hola, {nombreUsuario}
+                                </span>
+                            </Link>
+                        ) : (
+                            <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+                                <Link to="/login" style={{ color: 'var(--texto-2)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500' }}>
+                                    Ingresar
+                                </Link>
+                                <Link to="/registro" style={{ backgroundColor: 'var(--brand-1)', color: '#fff', padding: '0.4rem 0.8rem', borderRadius: '4px', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '600' }}>
+                                    Registrarse
+                                </Link>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
             </div>
-        </header >
+        </header>
     );
 };
 

@@ -1,22 +1,18 @@
 import React, { useState, useRef } from 'react';
 import Icon from '../components/Icon';
 
-const BARRIOS = ["Zona Norte", "Zona Centro", "Zona Sur", "Zona Este", "Zona Oeste"];
-
 const MiCuenta = () => {
     const fileInputRef = useRef(null);
     const [avatar, setAvatar] = useState(null);
 
-    // 1. Agregamos el email al estado inicial
+    // 1. Sacamos direccion y barrio del estado inicial
     const [datos, setDatos] = useState({
         nombre: 'Ana',
         apellido: 'Gómez',
         documento: '34567890',
         fechaNacimiento: '1990-05-15',
-        email: 'ana.gomez@email.com', // <-- Campo nuevo
-        telefono: '3385 55-0123',
-        direccion: 'Sarmiento 123',
-        barrio: 'Zona Norte'
+        email: 'ana.gomez@email.com',
+        telefono: '3385 55-0123'
     });
 
     const [passwords, setPasswords] = useState({
@@ -90,7 +86,7 @@ const MiCuenta = () => {
 
                     <div>
                         <strong style={{ display: 'block', fontSize: '1.15rem' }}>{datos.nombre} {datos.apellido}</strong>
-                        <span style={{ fontSize: '.85rem', color: 'var(--texto-3)', display: 'block', marginBottom: '.3rem' }}>{datos.barrio}</span>
+                        {/* 2. Eliminamos el span que mostraba el barrio acá */}
 
                         <input
                             type="file"
@@ -103,7 +99,7 @@ const MiCuenta = () => {
                             type="button"
                             className="link-btn"
                             onClick={triggerFileInput}
-                            style={{ padding: 0, fontSize: '.8rem' }}
+                            style={{ padding: 0, fontSize: '.8rem', marginTop: '.3rem' }}
                         >
                             <Icon name="camera" size={14} /> Cambiar foto
                         </button>
@@ -137,7 +133,6 @@ const MiCuenta = () => {
                         </div>
                     </div>
 
-                    {/* 2. Agrupamos Email y Teléfono en la misma fila */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0 1rem' }}>
                         <div className="field">
                             <label htmlFor="email">Correo electrónico</label>
@@ -149,18 +144,7 @@ const MiCuenta = () => {
                         </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0 1rem' }}>
-                        <div className="field" style={{ gridColumn: '1 / -1' }}>
-                            <label htmlFor="direccion">Dirección</label>
-                            <input type="text" id="direccion" name="direccion" value={datos.direccion} onChange={handleChange} required />
-                        </div>
-                        <div className="field" style={{ gridColumn: '1 / -1' }}>
-                            <label htmlFor="barrio">Barrio / Zona</label>
-                            <select id="barrio" name="barrio" value={datos.barrio} onChange={handleChange}>
-                                {BARRIOS.map(b => <option key={b} value={b}>{b}</option>)}
-                            </select>
-                        </div>
-                    </div>
+                    {/* 3. Eliminamos por completo el bloque que contenía los inputs de Dirección y Barrio */}
 
                     <button type="submit" className="btn btn-primary btn-block" style={{ marginTop: '.5rem' }}>
                         Guardar cambios
