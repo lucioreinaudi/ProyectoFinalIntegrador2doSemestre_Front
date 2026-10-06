@@ -1205,3 +1205,70 @@ main {
     font-size: .82rem;
     color: var(--texto-3);
 }
+
+/* ---------------- CONSEJOS DESPLEGABLES ---------------- */
+.consejo {
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radius-m);
+    overflow: hidden;
+
+    > summary {
+        list-style: none;
+        cursor: pointer;
+        border: 0;
+        border-radius: 0;
+
+        &::-webkit-details-marker { display: none; }
+        > div { flex: 1; }
+    }
+
+    &[open] > summary { border-bottom: 1px solid var(--borde); }
+    &[open] .consejo-chev { transform: rotate(180deg); }
+}
+
+.consejo-chev {
+    display: flex;
+    transition: transform .2s;
+}
+
+.consejo-body {
+    padding: .9rem 1rem 1rem;
+    display: grid;
+    gap: .8rem;
+}
+
+.consejo-paso {
+    h3 {
+        font-size: .8rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin: 0 0 .3rem;
+    }
+
+    ul {
+        margin: 0;
+        padding-left: 1.1rem;
+        display: grid;
+        gap: .25rem;
+        font-size: .9rem;
+        color: var(--texto-2);
+    }
+
+    &.antes h3 { color: var(--info-texto); }
+    &.durante h3 { color: var(--alto-texto); }
+    &.despues h3 { color: var(--bajo-texto); }
+}
+
+.consejo-llamar {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    justify-self: start;
+    background: var(--info-bg);
+    color: var(--info-texto);
+    padding: .55rem .9rem;
+    border-radius: 999px;
+    font-size: .88rem;
+    text-decoration: none;
+}
