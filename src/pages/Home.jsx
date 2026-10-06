@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../components/Icon';
 import AlertsList from '../components/AlertsList';
+import ConsejosSeguridad from '../components/ConsejosSeguridad';
 
 // Datos estáticos
 const ZONAS = ["Zona Norte", "Zona Centro", "Zona Sur", "Zona Este", "Zona Oeste"];
@@ -135,6 +136,9 @@ const Home = () => {
                         ))}
                     </div>
                 </div>
+
+                {/* CONSEJOS DE SEGURIDAD */}
+                <ConsejosSeguridad />
 
             </div>
         </section>
