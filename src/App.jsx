@@ -7,6 +7,7 @@ import NuevoReporte from './pages/NuevoReporte';
 import MisReportes from './pages/MisReportes';
 import MiCuenta from './pages/MiCuenta';
 import InfoUtil from './pages/InfoUtil';
+import AdminPanel from './pages/AdminPanel';
 
 // 1. Importamos las páginas de acceso
 import Login from './pages/Login';
@@ -25,6 +26,7 @@ function App() {
                     <Route path="/mis-reportes" element={<MisReportes />} />
                     <Route path="/cuenta" element={<MiCuenta />} />
                     <Route path="/info" element={<InfoUtil />} />
+                    <Route path="/admin" element={<AdminPanel />} />
 
                     {/* 2. Agregamos las rutas */}
                     <Route path="/login" element={<Login />} />

@@ -24,7 +24,8 @@ const ClickHandler = ({ setPosition }) => {
     return null;
 };
 
-const LocationPicker = ({ position, setPosition }) => {
+// 1. Agregamos la prop "soloPinManual"
+const LocationPicker = ({ position, setPosition, soloPinManual = false }) => {
     // Coordenadas centrales de Laboulaye
     const centerLaboulaye = [-34.1266, -63.3912];
 
@@ -47,14 +48,16 @@ const LocationPicker = ({ position, setPosition }) => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
 
-            {/* Botón de Ubicación Actual */}
-            <button
-                type="button"
-                className="btn btn-outline btn-block"
-                onClick={handleGetLocation}
-            >
-                <Icon name="map" size={18} /> Usar mi ubicación actual
-            </button>
+            {/* 2. Condicionamos la aparición del botón de GPS */}
+            {!soloPinManual && (
+                <button
+                    type="button"
+                    className="btn btn-outline btn-block"
+                    onClick={handleGetLocation}
+                >
+                    <Icon name="map" size={18} /> Usar mi ubicación actual
+                </button>
+            )}
 
             {/* Contenedor del Mapa */}
             <div style={{ height: '280px', width: '100%', borderRadius: 'var(--radius-m)', overflow: 'hidden', border: '1px solid var(--borde-fuerte)', zIndex: 0 }}>
@@ -75,7 +78,7 @@ const LocationPicker = ({ position, setPosition }) => {
             <p style={{ fontSize: '0.8rem', color: 'var(--texto-3)', margin: 0 }}>
                 {position
                     ? `📍 Coordenadas: ${position.lat.toFixed(5)}, ${position.lng.toFixed(5)}`
-                    : 'Toca en el mapa para marcar el lugar exacto del problema.'}
+                    : 'Toca en el mapa para marcar el lugar exacto.'}
             </p>
         </div>
     );
