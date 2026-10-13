@@ -1,12 +1,19 @@
 import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Icon from './Icon';
-import { selectEstaLogueado, selectUsuario } from '../features/auth/authSlice';
+import { logout, selectEstaLogueado, selectUsuario } from '../features/auth/authSlice';
 
 const TopBar = () => {
     const estaLogueado = useSelector(selectEstaLogueado);
     const usuario = useSelector(selectUsuario);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate('/');
+    };
 
     return (
         <header className="topbar">
@@ -62,12 +69,17 @@ const TopBar = () => {
                     {/* LÓGICA DE INGRESO / USUARIO LOGUEADO */}
                     <div style={{ display: 'flex', alignItems: 'center', marginLeft: '0.5rem', paddingLeft: '0.5rem', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
                         {estaLogueado ? (
-                            <Link to="/cuenta" className="icon-btn wide" title="Mi cuenta" style={{ textDecoration: 'none' }}>
-                                <Icon name="user" />
-                                <span className="a11y-label" style={{ display: 'inline-block', marginLeft: '0.3rem', fontWeight: '600' }}>
-                                    Hola, {usuario?.nombre}
-                                </span>
-                            </Link>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <Link to="/cuenta" className="icon-btn wide" title="Mi cuenta" style={{ textDecoration: 'none' }}>
+                                    <Icon name="user" />
+                                    <span className="a11y-label" style={{ display: 'inline-block', marginLeft: '0.3rem', fontWeight: '600' }}>
+                                        Hola, {usuario?.nombre}
+                                    </span>
+                                </Link>
+                                <button type="button" className="icon-btn" title="Salir" onClick={handleLogout}>
+                                    <Icon name="logout" />
+                                </button>
+                            </div>
                         ) : (
                             <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
                                 <Link to="/login" style={{ color: 'var(--texto-2)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500' }}>
