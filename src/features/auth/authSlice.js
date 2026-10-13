@@ -17,12 +17,28 @@ export const login = createAsyncThunk(
     },
 )
 
+// Crea la cuenta (POST /api/usuarios). A proposito NO loguea automaticamente:
+// el flujo actual manda al usuario a la pantalla de login despues de registrarse.
+export const register = createAsyncThunk(
+    'auth/register',
+    async (datos, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/api/usuarios', datos)
+            return response.data
+        } catch (error) {
+            return rejectWithValue(error.response?.status)
+        }
+    },
+)
+
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
         usuario: null,
-        status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+        status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed' (login)
         error: null,
+        registerStatus: 'idle', // idem, pero para el registro
+        registerError: null,
     },
     reducers: {
         logout: (state) => {
@@ -44,6 +60,17 @@ const authSlice = createSlice({
             .addCase(login.rejected, (state, action) => {
                 state.status = 'failed'
                 state.error = action.payload
+            })
+            .addCase(register.pending, (state) => {
+                state.registerStatus = 'loading'
+                state.registerError = null
+            })
+            .addCase(register.fulfilled, (state) => {
+                state.registerStatus = 'succeeded'
+            })
+            .addCase(register.rejected, (state, action) => {
+                state.registerStatus = 'failed'
+                state.registerError = action.payload
             })
     },
 })

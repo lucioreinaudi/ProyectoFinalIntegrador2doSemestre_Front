@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Icon from '../components/Icon';
+import { useDispatch, useSelector } from 'react-redux';
+import { register } from '../features/auth/authSlice';
 
 const Registro = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { registerStatus, registerError } = useSelector((state) => state.auth);
     const [datos, setDatos] = useState({
         nombre: '',
         apellido: '',
@@ -14,24 +17,39 @@ const Registro = () => {
         password: '',
         repetirPassword: ''
     });
+    const [errorPasswords, setErrorPasswords] = useState('');
 
     const handleChange = (e) => {
         setDatos({ ...datos, [e.target.name]: e.target.value });
     };
 
-    const handleRegistro = (e) => {
+    const handleRegistro = async (e) => {
         e.preventDefault();
+        setErrorPasswords('');
+
         if (datos.password !== datos.repetirPassword) {
-            alert('Las contraseñas no coinciden. Por favor, verificalas.');
+            setErrorPasswords('Las contraseñas no coinciden. Por favor, verificalas.');
             return;
         }
 
         // Armamos el objeto final sin la clave repetida
         const { repetirPassword, ...datosParaEnviar } = datos;
-        console.log("Datos para registrar:", datosParaEnviar);
 
-        alert('¡Cuenta creada con éxito! Ya podés iniciar sesión.');
-        navigate('/login'); // Lo mandamos a loguearse
+        try {
+            await dispatch(register(datosParaEnviar)).unwrap();
+            alert('¡Cuenta creada con éxito! Ya podés iniciar sesión.');
+            navigate('/login');
+        } catch {
+            // El error ya queda guardado en el estado (authSlice) y se muestra abajo.
+        }
+    };
+
+    const mensajeError = () => {
+        if (errorPasswords) return errorPasswords;
+        if (registerError === 409) return 'Ya existe una cuenta con ese email.';
+        if (registerError === 400) return 'Revisá los datos ingresados.';
+        if (registerError) return 'Ocurrió un error, intentá de nuevo.';
+        return null;
     };
 
     return (
@@ -42,6 +60,11 @@ const Registro = () => {
             </div>
 
             <div className="card-box">
+                {mensajeError() && (
+                    <p style={{ color: '#c0392b', fontSize: '.85rem', marginBottom: '1rem' }}>
+                        {mensajeError()}
+                    </p>
+                )}
                 <form onSubmit={handleRegistro}>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0 1rem' }}>
@@ -91,8 +114,8 @@ const Registro = () => {
                         </div>
                     </div>
 
-                    <button type="submit" className="btn btn-primary btn-block">
-                        Registrarme
+                    <button type="submit" className="btn btn-primary btn-block" disabled={registerStatus === 'loading'}>
+                        {registerStatus === 'loading' ? 'Creando cuenta...' : 'Registrarme'}
                     </button>
                 </form>
             </div>
