@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Icon from '../components/Icon';
+import { login } from '../features/auth/authSlice';
 
 const Login = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { status, error } = useSelector((state) => state.auth);
     const [credenciales, setCredenciales] = useState({
         email: '',
         password: ''
@@ -13,12 +17,14 @@ const Login = () => {
         setCredenciales({ ...credenciales, [e.target.name]: e.target.value });
     };
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        console.log("Enviando credenciales al back:", credenciales);
-        // Acá iría la lógica real contra tu API. Por ahora simulamos que entra:
-        alert('¡Sesión iniciada con éxito!');
-        navigate('/'); // Redirige al inicio
+        try {
+            await dispatch(login(credenciales)).unwrap();
+            navigate('/');
+        } catch {
+            // El error ya queda guardado en el estado (authSlice) y se muestra abajo.
+        }
     };
 
     return (
@@ -32,6 +38,11 @@ const Login = () => {
             </div>
 
             <div className="card-box">
+                {error && (
+                    <p style={{ color: '#c0392b', fontSize: '.85rem', marginBottom: '1rem' }}>
+                        {error === 401 ? 'Email o contraseña incorrectos' : 'Ocurrió un error, intentá de nuevo'}
+                    </p>
+                )}
                 <form onSubmit={handleLogin}>
                     <div className="field">
                         <label htmlFor="email">Correo electrónico</label>
@@ -48,8 +59,8 @@ const Login = () => {
                         <input type="password" id="password" name="password" value={credenciales.password} onChange={handleChange} required />
                     </div>
 
-                    <button type="submit" className="btn btn-primary btn-block" style={{ marginTop: '1.5rem' }}>
-                        Ingresar
+                    <button type="submit" className="btn btn-primary btn-block" style={{ marginTop: '1.5rem' }} disabled={status === 'loading'}>
+                        {status === 'loading' ? 'Ingresando...' : 'Ingresar'}
                     </button>
                 </form>
             </div>

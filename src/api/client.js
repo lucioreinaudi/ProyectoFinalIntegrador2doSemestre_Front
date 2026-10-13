@@ -1,31 +1,14 @@
-// import axios from 'axios'
+import axios from 'axios'
 
-// // URL base del backend de auth. Ej: VITE_AUTH_API_URL=http://localhost:8080
-// const API_URL = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8080'
+// URL base del backend. Definida en .env (VITE_API_URL).
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
-// const api = axios.create({
-//     baseURL: API_URL,
-// })
+const api = axios.create({
+    baseURL: API_URL,
+})
 
-// api.interceptors.request.use((config) => {
-//     const token = localStorage.getItem('token')
-//     if (token) {
-//         config.headers.Authorization = `Bearer ${token}`
-//     }
-//     return config
-// })
+// NOTA: el back todavia no emite un token de sesion real (ver AuthController).
+// Cuando lo haga, aca es donde se agregaria un interceptor para mandarlo
+// en cada pedido (Authorization: Bearer ...).
 
-// api.interceptors.response.use(
-//     (response) => response,
-//     (error) => {
-//         if (error.response?.status === 401) {
-//             localStorage.removeItem('token')
-//             if (window.location.pathname !== '/login') {
-//                 window.location.href = '/login'
-//             }
-//         }
-//         return Promise.reject(error)
-//     },
-// )
-
-// export default api
+export default api

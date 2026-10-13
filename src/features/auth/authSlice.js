@@ -1,12 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import api from '../../api/client'
 
+// IMPORTANTE: el back todavia no devuelve un token de sesion (ver AuthController,
+// que solo confirma email/password y devuelve los datos del usuario). Por eso esto
+// guarda al usuario en memoria (Redux), no en localStorage: se pierde el login
+// al refrescar la pagina. Cuando el back tenga un token real, esto se completa.
 export const login = createAsyncThunk(
     'auth/login',
     async ({ email, password }, { rejectWithValue }) => {
         try {
-            const response = await api.post('/auth/login', { email, password })
-            return response.data.token
+            const response = await api.post('/api/auth/login', { email, password })
+            return response.data
         } catch (error) {
             return rejectWithValue(error.response?.status)
         }
@@ -16,16 +20,15 @@ export const login = createAsyncThunk(
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
-        token: localStorage.getItem('token'),
+        usuario: null,
         status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
         error: null,
     },
     reducers: {
         logout: (state) => {
-            state.token = null
+            state.usuario = null
             state.status = 'idle'
             state.error = null
-            localStorage.removeItem('token')
         },
     },
     extraReducers: (builder) => {
@@ -36,8 +39,7 @@ const authSlice = createSlice({
             })
             .addCase(login.fulfilled, (state, action) => {
                 state.status = 'succeeded'
-                state.token = action.payload
-                localStorage.setItem('token', action.payload)
+                state.usuario = action.payload
             })
             .addCase(login.rejected, (state, action) => {
                 state.status = 'failed'
@@ -47,5 +49,6 @@ const authSlice = createSlice({
 })
 
 export const { logout } = authSlice.actions
-export const selectEstaLogueado = (state) => !!state.auth.token
+export const selectEstaLogueado = (state) => !!state.auth.usuario
+export const selectUsuario = (state) => state.auth.usuario
 export default authSlice.reducer
