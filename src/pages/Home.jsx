@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Icon from '../components/Icon';
+import { selectEstaLogueado } from '../features/auth/authSlice';
 import AlertsList from '../components/AlertsList';
 import ConsejosSeguridad from '../components/ConsejosSeguridad';
 
@@ -29,11 +31,16 @@ const ACCIONES_RAPIDAS = [
 ];
 
 const Home = () => {
+    const estaLogueado = useSelector(selectEstaLogueado);
+
     // Estados para los filtros
     const [filtroZona, setFiltroZona] = useState('todas');
     const [filtroNivel, setFiltroNivel] = useState('todos');
 
-    // Lógica de filtrado
+    // Ver mis reportes solo tiene sentido con sesion iniciada (completa SCRUM-52).
+    const accionesVisibles = ACCIONES_RAPIDAS.filter(a => a.ruta !== '/mis-reportes' || estaLogueado);
+
+    // Logica de filtrado
     const alertasFiltradas = ALERTAS.filter(a =>
         (filtroZona === 'todas' || a.zona === filtroZona) &&
         (filtroNivel === 'todos' || a.nivel === filtroNivel)
@@ -127,7 +134,7 @@ const Home = () => {
                         </div>
                     </div>
                     <div className="quick-grid">
-                        {ACCIONES_RAPIDAS.map((accion) => (
+                        {accionesVisibles.map((accion) => (
                             <Link to={accion.ruta} key={accion.titulo} className={`quick-card ${accion.primary ? 'primary' : ''}`}>
                                 <span className="qi"><Icon name={accion.icono} /></span>
                                 <strong>{accion.titulo}</strong>
