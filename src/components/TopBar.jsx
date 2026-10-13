@@ -45,12 +45,13 @@ const TopBar = () => {
                     <NavLink to="/reporte" className={({ isActive }) => isActive ? 'active-link' : ''}>
                         <Icon name="plus" size={18} /><span>Reportar problema</span>
                     </NavLink>
-                    <NavLink to="/mis-reportes" className={({ isActive }) => isActive ? 'active-link' : ''}>
-                        <Icon name="list" size={18} /><span>Mis reportes</span>
-                    </NavLink>
-                    <NavLink to="/cuenta" className={({ isActive }) => isActive ? 'active-link' : ''}>
-                        <Icon name="user" size={18} /><span>Mi cuenta</span>
-                    </NavLink>
+                    {estaLogueado && (
+                        <NavLink to="/mis-reportes" className={({ isActive }) => isActive ? 'active-link' : ''}>
+                            <Icon name="list" size={18} /><span>Mis reportes</span>
+                        </NavLink>
+                    )}
+                    {/* "Mi cuenta" ya no va aca: queda solo el de "Hola, {nombre}" de mas abajo,
+                        que apunta a la misma ruta (/cuenta) y ya depende de la sesion. */}
                 </nav>
 
                 {/* ACCIONES RAPIDAS */}
