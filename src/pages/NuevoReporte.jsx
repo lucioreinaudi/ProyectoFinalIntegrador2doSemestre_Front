@@ -47,9 +47,7 @@ const NuevoReporte = () => {
     return (
         <div className="page-wrap">
             <h1 className="page-title">Reportar un problema</h1>
-            <p style={{ marginTop: '-.9rem', color: 'var(--texto-3)', fontSize: '.9rem', marginBottom: '1.5rem' }}>
-                Podés reportar sin crear una cuenta. Cuanta más información nos des, más rápido podemos actuar.
-            </p>
+        
 
             <form onSubmit={handleSubmit}>
 
