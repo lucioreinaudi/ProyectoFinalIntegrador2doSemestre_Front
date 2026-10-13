@@ -1,10 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import api from '../../api/client'
 
-// IMPORTANTE: el back todavia no devuelve un token de sesion (ver AuthController,
-// que solo confirma email/password y devuelve los datos del usuario). Por eso esto
-// guarda al usuario en memoria (Redux), no en localStorage: se pierde el login
-// al refrescar la pagina. Cuando el back tenga un token real, esto se completa.
+function leerUsuarioGuardado() {
+    try {
+        const texto = localStorage.getItem('usuario')
+        return texto ? JSON.parse(texto) : null
+    } catch {
+        return null
+    }
+}
+
+// El back ahora devuelve { usuario, token } (ver AuthController / LoginResponse).
 export const login = createAsyncThunk(
     'auth/login',
     async ({ email, password }, { rejectWithValue }) => {
@@ -34,7 +40,9 @@ export const register = createAsyncThunk(
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
-        usuario: null,
+        // Se leen de localStorage al cargar la app, asi la sesion sobrevive a un refresh.
+        usuario: leerUsuarioGuardado(),
+        token: localStorage.getItem('token'),
         status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed' (login)
         error: null,
         registerStatus: 'idle', // idem, pero para el registro
@@ -43,8 +51,11 @@ const authSlice = createSlice({
     reducers: {
         logout: (state) => {
             state.usuario = null
+            state.token = null
             state.status = 'idle'
             state.error = null
+            localStorage.removeItem('usuario')
+            localStorage.removeItem('token')
         },
     },
     extraReducers: (builder) => {
@@ -55,7 +66,10 @@ const authSlice = createSlice({
             })
             .addCase(login.fulfilled, (state, action) => {
                 state.status = 'succeeded'
-                state.usuario = action.payload
+                state.usuario = action.payload.usuario
+                state.token = action.payload.token
+                localStorage.setItem('usuario', JSON.stringify(action.payload.usuario))
+                localStorage.setItem('token', action.payload.token)
             })
             .addCase(login.rejected, (state, action) => {
                 state.status = 'failed'
