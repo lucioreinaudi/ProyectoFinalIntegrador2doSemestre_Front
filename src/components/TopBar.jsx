@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Icon from './Icon';
+import { selectEstaLogueado, selectUsuario } from '../features/auth/authSlice';
 
 const TopBar = () => {
-    // Cambiá a 'true' para ver cómo se ve con la sesión iniciada
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const nombreUsuario = "Joaquín";
+    const estaLogueado = useSelector(selectEstaLogueado);
+    const usuario = useSelector(selectUsuario);
 
     return (
         <header className="topbar">
@@ -60,11 +61,11 @@ const TopBar = () => {
 
                     {/* LÓGICA DE INGRESO / USUARIO LOGUEADO */}
                     <div style={{ display: 'flex', alignItems: 'center', marginLeft: '0.5rem', paddingLeft: '0.5rem', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
-                        {isLoggedIn ? (
+                        {estaLogueado ? (
                             <Link to="/cuenta" className="icon-btn wide" title="Mi cuenta" style={{ textDecoration: 'none' }}>
                                 <Icon name="user" />
                                 <span className="a11y-label" style={{ display: 'inline-block', marginLeft: '0.3rem', fontWeight: '600' }}>
-                                    Hola, {nombreUsuario}
+                                    Hola, {usuario?.nombre}
                                 </span>
                             </Link>
                         ) : (
