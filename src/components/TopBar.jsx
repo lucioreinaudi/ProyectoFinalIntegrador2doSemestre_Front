@@ -2,11 +2,14 @@ import React from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from './Icon';
+import PanelAccesibilidad from './PanelAccesibilidad';
 import { logout, selectEstaLogueado, selectUsuario } from '../features/auth/authSlice';
+import { alternarTema, selectTema } from '../features/preferencias/preferenciasSlice';
 
 const TopBar = () => {
     const estaLogueado = useSelector(selectEstaLogueado);
     const usuario = useSelector(selectUsuario);
+    const esOscuro = useSelector(selectTema) === 'oscuro';
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -17,6 +20,7 @@ const TopBar = () => {
 
     return (
         <header className="topbar">
+            <a href="#contenido-principal" className="saltar-contenido">Saltar al contenido</a>
             <div className="topbar-inner">
 
                 {/* LOGO Y MARCA */}
@@ -56,12 +60,16 @@ const TopBar = () => {
 
                 {/* ACCIONES RAPIDAS */}
                 <div className="topbar-actions">
-                    <button className="icon-btn" title="Cambiar tema">
-                        <Icon name="moon" />
+                    <button
+                        type="button"
+                        className="icon-btn"
+                        title={esOscuro ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                        aria-label={esOscuro ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                        onClick={() => dispatch(alternarTema())}
+                    >
+                        <Icon name={esOscuro ? 'sun' : 'moon'} />
                     </button>
-                    <button className="icon-btn wide" title="Accesibilidad">
-                        <Icon name="a11y" /><span className="a11y-label">Accesibilidad</span>
-                    </button>
+                    <PanelAccesibilidad />
                     <button className="icon-btn" title="Notificaciones">
                         <Icon name="bell" />
                         <span className="badge-dot">3</span>
@@ -86,7 +94,7 @@ const TopBar = () => {
                                 <Link to="/login" style={{ color: 'var(--texto-2)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500' }}>
                                     Ingresar
                                 </Link>
-                                <Link to="/registro" style={{ backgroundColor: 'var(--brand-1)', color: '#fff', padding: '0.4rem 0.8rem', borderRadius: '4px', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '600' }}>
+                                <Link to="/registro" style={{ backgroundColor: 'var(--brand-fondo)', color: '#fff', padding: '0.4rem 0.8rem', borderRadius: '4px', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '600' }}>
                                     Registrarse
                                 </Link>
                             </div>

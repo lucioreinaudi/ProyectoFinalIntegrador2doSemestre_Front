@@ -1,10 +1,21 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Conectar Laboulaye</title>
+  <script>
+    // Aplica tema y tamaño de texto antes de que cargue React, para evitar el destello en modo oscuro.
+    // La logica completa vive en src/features/preferencias.
+    try {
+      var p = JSON.parse(localStorage.getItem('preferencias')) || {};
+      var oscuro = p.tema ? p.tema === 'oscuro' : matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset.theme = oscuro ? 'dark' : 'light';
+      var tamanos = [100, 112.5, 125, 137.5];
+      if (tamanos[p.tamanoTexto]) document.documentElement.style.fontSize = tamanos[p.tamanoTexto] + '%';
+    } catch (e) { }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap"

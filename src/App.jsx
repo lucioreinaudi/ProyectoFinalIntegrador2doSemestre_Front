@@ -8,6 +8,7 @@ import MisReportes from './pages/MisReportes';
 import MiCuenta from './pages/MiCuenta';
 import InfoUtil from './pages/InfoUtil';
 import AdminPanel from './pages/AdminPanel';
+import useAplicarPreferencias from './features/preferencias/useAplicarPreferencias';
 
 // 1. Importamos las páginas de acceso
 import Login from './pages/Login';
@@ -16,10 +17,12 @@ import Registro from './pages/Registro';
 import './styles/main.scss';
 
 function App() {
+    useAplicarPreferencias();
+
     return (
         <BrowserRouter>
             <TopBar />
-            <main id="contenido-principal">
+            <main id="contenido-principal" tabIndex={-1}>
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/reporte" element={<NuevoReporte />} />

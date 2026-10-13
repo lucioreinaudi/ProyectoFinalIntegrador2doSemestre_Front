@@ -3,6 +3,10 @@
     --brand-2: #0B3B73;
     --brand-3: #2E86D8;
     --brand-1-rgb: 22, 86, 166;
+    // Fondos con letra blanca encima: en modo oscuro no se aclaran (a diferencia de --brand-1)
+    --brand-fondo: #1656A6;
+    --brand-fondo-2: #2E86D8;
+    --icono-fondo: rgba(255, 255, 255, .55);
 
     --bg: #F3F6FA;
     --superficie: #FFFFFF;
@@ -42,6 +46,9 @@ html[data-theme="dark"] {
     --brand-1: #4F9FE0;
     --brand-2: #0B3B73;
     --brand-3: #6FB4EC;
+    --brand-fondo: #1A5FAE;
+    --brand-fondo-2: #2272C2;
+    --icono-fondo: rgba(255, 255, 255, .08);
 
     --bg: #0E1620;
     --superficie: #17212E;
@@ -313,6 +320,190 @@ main {
     border: 2px solid var(--superficie);
 }
 
+/* ---------------- ACCESIBILIDAD ---------------- */
+// Link "Saltar al contenido": invisible hasta que se navega con teclado
+.saltar-contenido {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    background: var(--brand-fondo);
+    color: #fff;
+    font-weight: 700;
+    padding: .6rem 1rem;
+    border-radius: var(--radius-s);
+    transition: top .15s ease;
+}
+
+.saltar-contenido:focus {
+    top: .6rem;
+}
+
+main:focus {
+    outline: none;
+}
+
+.icon-btn.activo {
+    background: var(--info-bg);
+    color: var(--brand-1);
+    border-color: var(--info-borde);
+}
+
+.a11y-contenedor {
+    position: relative;
+}
+
+.a11y-panel {
+    position: absolute;
+    top: calc(100% + .5rem);
+    right: 0;
+    z-index: 90;
+    width: min(20rem, calc(100vw - 2rem));
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radius-m);
+    box-shadow: var(--sombra);
+    padding: .5rem .9rem .9rem;
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+}
+
+// En celular el boton queda mas al centro: el panel se fija al ancho de la pantalla
+@media (max-width: 959px) {
+    .a11y-panel {
+        position: fixed;
+        top: 4.5rem;
+        left: 1rem;
+        right: 1rem;
+        width: auto;
+    }
+}
+
+.a11y-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: .35rem;
+    border-bottom: 1px solid var(--borde);
+    margin-bottom: .2rem;
+
+    h2 {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--texto-1);
+    }
+}
+
+.a11y-opcion,
+.a11y-texto {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    width: 100%;
+    padding: .6rem .4rem;
+    border-radius: var(--radius-s);
+}
+
+.a11y-opcion {
+    background: none;
+    border: none;
+    text-align: left;
+}
+
+.a11y-opcion:hover {
+    background: var(--superficie-2);
+}
+
+.a11y-opcion-texto {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    strong {
+        font-size: .92rem;
+        color: var(--texto-1);
+    }
+
+    small {
+        font-size: .82rem;
+        color: var(--texto-2);
+    }
+}
+
+.a11y-switch {
+    position: relative;
+    flex-shrink: 0;
+    width: 2.6rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    background: var(--borde-fuerte);
+    transition: background .15s ease;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: .2rem;
+        left: .2rem;
+        width: 1.1rem;
+        height: 1.1rem;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+        transition: transform .15s ease;
+    }
+
+    &.activo {
+        background: var(--brand-fondo);
+    }
+
+    &.activo::after {
+        transform: translateX(1.1rem);
+    }
+}
+
+.a11y-texto-botones {
+    display: flex;
+    gap: .35rem;
+
+    button {
+        min-width: 2.6rem;
+        height: 2.3rem;
+        border: 1px solid var(--borde-fuerte);
+        border-radius: var(--radius-s);
+        background: var(--superficie);
+        color: var(--texto-1);
+        font-weight: 800;
+    }
+
+    button:hover:not(:disabled) {
+        background: var(--info-bg);
+        color: var(--brand-1);
+    }
+
+    button:disabled {
+        opacity: .45;
+        cursor: not-allowed;
+    }
+}
+
+.a11y-restablecer {
+    margin-top: .3rem;
+    padding: .55rem;
+    background: none;
+    border: 1px solid var(--borde-fuerte);
+    border-radius: var(--radius-s);
+    color: var(--texto-1);
+    font-weight: 600;
+}
+
+.a11y-restablecer:hover {
+    background: var(--superficie-2);
+}
+
 @media (min-width: 960px) {
     .top-nav {
         display: flex;
@@ -372,7 +563,7 @@ main {
 /* ---------------- HERO ---------------- */
 .hero {
     position: relative;
-    background: linear-gradient(120deg, var(--brand-2), var(--brand-1) 65%, var(--brand-3));
+    background: linear-gradient(120deg, var(--brand-2), var(--brand-fondo) 65%, var(--brand-fondo-2));
     color: #fff;
     padding: 2rem 1rem;
 }
@@ -549,7 +740,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, .55);
+    background: var(--icono-fondo);
 }
 
 .contact-card .ci svg {
@@ -666,8 +857,8 @@ main {
 
 .quick-card.primary {
     grid-column: 1 / -1;
-    background: var(--brand-1);
-    border-color: var(--brand-1);
+    background: var(--brand-fondo);
+    border-color: var(--brand-fondo);
     color: #fff;
 }
 
@@ -700,7 +891,7 @@ main {
 }
 
 .btn-primary {
-    background: var(--brand-1);
+    background: var(--brand-fondo);
     color: #fff;
 }
 
@@ -813,7 +1004,7 @@ main {
 }
 
 .seg-filtro button[aria-pressed="true"] {
-    background: var(--brand-1);
+    background: var(--brand-fondo);
     color: #fff;
 }
 
@@ -1056,8 +1247,8 @@ main {
 }
 
 .chip-option[aria-pressed="true"] {
-    background: var(--brand-1);
-    border-color: var(--brand-1);
+    background: var(--brand-fondo);
+    border-color: var(--brand-fondo);
     color: #fff;
 }
 
@@ -1271,4 +1462,56 @@ main {
     border-radius: 999px;
     font-size: .88rem;
     text-decoration: none;
+}
+
+/* ---------------- PREFERENCIAS DE ACCESIBILIDAD ----------------
+   Las activa useAplicarPreferencias poniendo atributos en <html>. */
+
+// Alto contraste: textos secundarios y bordes casi tan fuertes como el principal
+html[data-alto-contraste] {
+    --texto-2: #1F2E40;
+    --texto-3: #2F3F52;
+    --borde: #5D6B7B;
+    --borde-fuerte: #2F3F52;
+    --brand-1: #0D3F80;
+    --brand-fondo: #0D3F80;
+    --brand-fondo-2: #1656A6;
+    --focus: 0 0 0 3px #000, 0 0 0 5px #FFD400;
+}
+
+html[data-theme="dark"][data-alto-contraste] {
+    --bg: #000000;
+    --superficie: #0A0F15;
+    --superficie-2: #000000;
+    --texto-1: #FFFFFF;
+    --texto-2: #E6EDF3;
+    --texto-3: #D0DAE3;
+    --borde: #8A99A8;
+    --borde-fuerte: #C9D3DC;
+    --brand-1: #8CC4F5;
+    --brand-fondo: #0D3F80;
+    --brand-fondo-2: #0D3F80;
+    --focus: 0 0 0 3px #FFD400;
+}
+
+// Reducir animaciones: corta transiciones, animaciones y el scroll suave
+html[data-reducir-movimiento] {
+    scroll-behavior: auto;
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+// Subrayar enlaces: todos los links de texto se ven como links
+html[data-subrayar-enlaces] {
+    main a,
+    .top-nav a {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
 }
