@@ -64,12 +64,21 @@ const NuevoReporte = () => {
             alert('Por favor, agregá una descripción breve.'); return;
         }
 
-        // Prioridad para el titulo: lo que escribio en el campo Titulo: si lo dejo
-        // vacio, lo que escribio al especificar "Otro"; si tampoco, el nombre de
-        // la categoria elegida.
-        const tituloFinal = titulo.trim()
-            ? titulo.trim()
-            : (esOtro && categoriaOtro.trim() ? categoriaOtro.trim() : categoriaSeleccionada.nombre);
+        // Si la categoria es "Otro", el titulo se arma con lo que escribio el
+        // usuario (el campo Titulo si lo completo, o si no lo que puso al
+        // especificar el problema) + "(Otro)" al lado, para que quede claro
+        // para el admin que esa categoria no existe en el back todavia.
+        // Si no es "Otro", el titulo es el campo Titulo, o si no el nombre
+        // de la categoria elegida.
+        let tituloFinal;
+        if (esOtro) {
+            // Aca el titulo general no aplica: el nombre de este reclamo es siempre
+            // lo que se escribio en "Especifica el problema", para que no haya dos
+            // campos compitiendo por lo mismo.
+            tituloFinal = `${categoriaOtro.trim()} (Otro)`;
+        } else {
+            tituloFinal = titulo.trim() || categoriaSeleccionada.nombre;
+        }
 
         try {
             await dispatch(crearReclamo({
@@ -118,17 +127,21 @@ const NuevoReporte = () => {
 
             <form onSubmit={handleSubmit}>
 
-                {/* TITULO (opcional) */}
-                <div className="field">
-                    <label htmlFor="titulo">Título (opcional)</label>
-                    <input
-                        type="text"
-                        id="titulo"
-                        placeholder="Ej: Bache grande esquina San Martín y Belgrano"
-                        value={titulo}
-                        onChange={(e) => setTitulo(e.target.value)}
-                    />
-                </div>
+                {/* TITULO (opcional). No se muestra si la categoria es "Otro": ahi el
+                    titulo sale de "Especifica el problema", para no tener dos campos
+                    que hacen lo mismo. */}
+                {!esOtro && (
+                    <div className="field">
+                        <label htmlFor="titulo">Título (opcional)</label>
+                        <input
+                            type="text"
+                            id="titulo"
+                            placeholder="Ej: Bache grande esquina San Martín y Belgrano"
+                            value={titulo}
+                            onChange={(e) => setTitulo(e.target.value)}
+                        />
+                    </div>
+                )}
 
                 {/* ZONA */}
                 <div className="field">
