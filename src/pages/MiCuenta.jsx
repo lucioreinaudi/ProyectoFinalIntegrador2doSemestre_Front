@@ -2,13 +2,13 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from '../components/Icon';
-import { actualizarPerfil, logout, selectUsuario } from '../features/auth/authSlice';
+import { actualizarPerfil, cambiarPassword, logout, selectUsuario } from '../features/auth/authSlice';
 
 const MiCuenta = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const usuario = useSelector(selectUsuario);
-    const { perfilStatus, perfilError } = useSelector((state) => state.auth);
+    const { perfilStatus, perfilError, passwordStatus, passwordError } = useSelector((state) => state.auth);
 
     const fileInputRef = useRef(null);
     const [avatar, setAvatar] = useState(null);
@@ -64,16 +64,22 @@ const MiCuenta = () => {
         }
     };
 
-    const handleCambiarPassword = (e) => {
+    const handleCambiarPassword = async (e) => {
         e.preventDefault();
         if (passwords.nueva !== passwords.repetir) {
             alert('Las contraseñas nuevas no coinciden.');
             return;
         }
-        // TODO: falta conectar esto al endpoint PUT /api/usuarios/me/password (proxima card).
-        console.log("Enviando nueva contraseña al back...");
-        alert('Contraseña actualizada con éxito.');
-        setPasswords({ actual: '', nueva: '', repetir: '' });
+        try {
+            await dispatch(cambiarPassword({
+                passwordActual: passwords.actual,
+                passwordNueva: passwords.nueva
+            })).unwrap();
+            alert('Contraseña actualizada con éxito.');
+            setPasswords({ actual: '', nueva: '', repetir: '' });
+        } catch {
+            // El error ya queda en el estado (authSlice) y se muestra abajo.
+        }
     };
 
     const handleLogout = () => {
@@ -197,6 +203,11 @@ const MiCuenta = () => {
                 <h2 style={{ fontSize: '1.05rem', marginBottom: '1rem', borderBottom: '1px solid var(--borde)', paddingBottom: '.5rem' }}>
                     Seguridad
                 </h2>
+                {passwordError && (
+                    <p style={{ color: '#c0392b', fontSize: '.85rem', marginBottom: '1rem' }}>
+                        {passwordError === 400 ? 'La contraseña actual es incorrecta.' : 'No se pudo actualizar la contraseña. Intenta de nuevo.'}
+                    </p>
+                )}
                 <form onSubmit={handleCambiarPassword}>
                     <div className="field">
                         <label htmlFor="actual">Contraseña actual</label>
@@ -212,8 +223,8 @@ const MiCuenta = () => {
                             <input type="password" id="repetir" name="repetir" value={passwords.repetir} onChange={handlePassChange} required />
                         </div>
                     </div>
-                    <button type="submit" className="btn btn-outline btn-block" style={{ marginTop: '.5rem' }}>
-                        Actualizar contraseña
+                    <button type="submit" className="btn btn-outline btn-block" style={{ marginTop: '.5rem' }} disabled={passwordStatus === 'loading'}>
+                        {passwordStatus === 'loading' ? 'Actualizando...' : 'Actualizar contraseña'}
                     </button>
                 </form>
             </div>

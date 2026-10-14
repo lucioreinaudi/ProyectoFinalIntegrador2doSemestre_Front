@@ -51,6 +51,21 @@ export const actualizarPerfil = createAsyncThunk(
     },
 )
 
+// Cambia la propia contraseña (PUT /api/usuarios/me/password). No devuelve
+// datos de usuario (el back responde 204), asi que no hay nada que guardar
+// en el estado mas alla de si funciono o no.
+export const cambiarPassword = createAsyncThunk(
+    'auth/cambiarPassword',
+    async (datos, { rejectWithValue }) => {
+        try {
+            await api.put('/api/usuarios/me/password', datos)
+            return true
+        } catch (error) {
+            return rejectWithValue(error.response?.status)
+        }
+    },
+)
+
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
@@ -63,6 +78,8 @@ const authSlice = createSlice({
         registerError: null,
         perfilStatus: 'idle', // idem, pero para editar el perfil
         perfilError: null,
+        passwordStatus: 'idle', // idem, pero para cambiar la contraseña
+        passwordError: null,
     },
     reducers: {
         logout: (state) => {
@@ -114,6 +131,17 @@ const authSlice = createSlice({
             .addCase(actualizarPerfil.rejected, (state, action) => {
                 state.perfilStatus = 'failed'
                 state.perfilError = action.payload
+            })
+            .addCase(cambiarPassword.pending, (state) => {
+                state.passwordStatus = 'loading'
+                state.passwordError = null
+            })
+            .addCase(cambiarPassword.fulfilled, (state) => {
+                state.passwordStatus = 'succeeded'
+            })
+            .addCase(cambiarPassword.rejected, (state, action) => {
+                state.passwordStatus = 'failed'
+                state.passwordError = action.payload
             })
     },
 })
