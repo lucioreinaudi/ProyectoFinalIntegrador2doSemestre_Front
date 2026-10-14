@@ -37,6 +37,20 @@ export const register = createAsyncThunk(
     },
 )
 
+// Edita el propio perfil (PUT /api/usuarios/me). El back devuelve el usuario
+// actualizado completo, que reemplaza al que ya estaba en el estado.
+export const actualizarPerfil = createAsyncThunk(
+    'auth/actualizarPerfil',
+    async (datos, { rejectWithValue }) => {
+        try {
+            const response = await api.put('/api/usuarios/me', datos)
+            return response.data
+        } catch (error) {
+            return rejectWithValue(error.response?.status)
+        }
+    },
+)
+
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
@@ -47,6 +61,8 @@ const authSlice = createSlice({
         error: null,
         registerStatus: 'idle', // idem, pero para el registro
         registerError: null,
+        perfilStatus: 'idle', // idem, pero para editar el perfil
+        perfilError: null,
     },
     reducers: {
         logout: (state) => {
@@ -85,6 +101,19 @@ const authSlice = createSlice({
             .addCase(register.rejected, (state, action) => {
                 state.registerStatus = 'failed'
                 state.registerError = action.payload
+            })
+            .addCase(actualizarPerfil.pending, (state) => {
+                state.perfilStatus = 'loading'
+                state.perfilError = null
+            })
+            .addCase(actualizarPerfil.fulfilled, (state, action) => {
+                state.perfilStatus = 'succeeded'
+                state.usuario = action.payload
+                localStorage.setItem('usuario', JSON.stringify(action.payload))
+            })
+            .addCase(actualizarPerfil.rejected, (state, action) => {
+                state.perfilStatus = 'failed'
+                state.perfilError = action.payload
             })
     },
 })

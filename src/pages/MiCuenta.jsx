@@ -2,24 +2,28 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from '../components/Icon';
-import { logout, selectUsuario } from '../features/auth/authSlice';
+import { actualizarPerfil, logout, selectUsuario } from '../features/auth/authSlice';
 
 const MiCuenta = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const usuario = useSelector(selectUsuario);
+    const { perfilStatus, perfilError } = useSelector((state) => state.auth);
 
     const fileInputRef = useRef(null);
     const [avatar, setAvatar] = useState(null);
 
-    // Datos reales del usuario logueado (antes era un mock fijo de "Ana Gomez").
+    // Datos reales del usuario logueado. zonaId no se edita desde este formulario
+    // (no hay selector de zona aca), pero se guarda igual para mandarlo de vuelta
+    // en el PUT: si no se manda, el back la borra (es un PUT, reemplaza todo).
     const [datos, setDatos] = useState({
         nombre: usuario?.nombre || '',
         apellido: usuario?.apellido || '',
         documento: usuario?.documento || '',
         fechaNacimiento: usuario?.fechaNacimiento || '',
         email: usuario?.email || '',
-        telefono: usuario?.telefono || ''
+        telefono: usuario?.telefono || '',
+        zonaId: usuario?.zonaId ?? null
     });
 
     const [passwords, setPasswords] = useState({
@@ -48,12 +52,16 @@ const MiCuenta = () => {
         setPasswords({ ...passwords, [e.target.name]: e.target.value });
     };
 
-    const handleGuardarDatos = (e) => {
+    const handleGuardarDatos = async (e) => {
         e.preventDefault();
-        // TODO: no existe todavia un endpoint PUT /api/usuarios/{id} en el back.
-        // Falta esa card para que esto guarde datos de verdad.
-        console.log("Datos a enviar al back:", { ...datos, avatarFile: fileInputRef.current.files ? fileInputRef.current.files[0] : null });
-        alert('Datos personales y foto guardados correctamente.');
+        // email no va: el back ni lo acepta (UsuarioActualizarRequest no tiene ese campo).
+        const { email, ...datosParaEnviar } = datos;
+        try {
+            await dispatch(actualizarPerfil(datosParaEnviar)).unwrap();
+            alert('Datos personales guardados correctamente.');
+        } catch {
+            // El error ya queda en el estado (authSlice) y se muestra abajo.
+        }
     };
 
     const handleCambiarPassword = (e) => {
@@ -62,7 +70,7 @@ const MiCuenta = () => {
             alert('Las contraseñas nuevas no coinciden.');
             return;
         }
-        // TODO: no existe todavia un endpoint para cambiar contraseña en el back.
+        // TODO: falta conectar esto al endpoint PUT /api/usuarios/me/password (proxima card).
         console.log("Enviando nueva contraseña al back...");
         alert('Contraseña actualizada con éxito.');
         setPasswords({ actual: '', nueva: '', repetir: '' });
@@ -138,6 +146,12 @@ const MiCuenta = () => {
                     Datos Personales
                 </h2>
 
+                {perfilError && (
+                    <p style={{ color: '#c0392b', fontSize: '.85rem', marginBottom: '1rem' }}>
+                        No se pudieron guardar los cambios. Intentá de nuevo.
+                    </p>
+                )}
+
                 <form onSubmit={handleGuardarDatos}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0 1rem' }}>
                         <div className="field">
@@ -164,7 +178,7 @@ const MiCuenta = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0 1rem' }}>
                         <div className="field">
                             <label htmlFor="email">Correo electrónico</label>
-                            <input type="email" id="email" name="email" value={datos.email} onChange={handleChange} required />
+                            <input type="email" id="email" name="email" value={datos.email} disabled title="El email no se puede modificar" />
                         </div>
                         <div className="field">
                             <label htmlFor="telefono">Teléfono</label>
@@ -172,8 +186,8 @@ const MiCuenta = () => {
                         </div>
                     </div>
 
-                    <button type="submit" className="btn btn-primary btn-block" style={{ marginTop: '.5rem' }}>
-                        Guardar cambios
+                    <button type="submit" className="btn btn-primary btn-block" style={{ marginTop: '.5rem' }} disabled={perfilStatus === 'loading'}>
+                        {perfilStatus === 'loading' ? 'Guardando...' : 'Guardar cambios'}
                     </button>
                 </form>
             </div>
