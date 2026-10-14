@@ -1319,6 +1319,11 @@ main:focus {
     color: var(--info-texto);
 }
 
+.estado-pill.revision {
+    background: var(--brand-fondo);
+    color: var(--brand-1);
+}
+
 .estado-pill.proceso {
     background: var(--medio-bg);
     color: var(--medio-texto);
