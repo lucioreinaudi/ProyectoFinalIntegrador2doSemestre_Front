@@ -18,6 +18,7 @@ const NuevoReporte = () => {
     const [cargandoCatalogos, setCargandoCatalogos] = useState(true);
     const [errorCatalogos, setErrorCatalogos] = useState(false);
 
+    const [titulo, setTitulo] = useState('');
     const [zonaId, setZonaId] = useState('');
     const [categoriaId, setCategoriaId] = useState('');
     const [categoriaOtro, setCategoriaOtro] = useState('');
@@ -63,13 +64,16 @@ const NuevoReporte = () => {
             alert('Por favor, agregá una descripción breve.'); return;
         }
 
-        // El titulo se arma solo: el nombre de la categoria, o lo que escribio
-        // si eligio "Otro". Reclamo no tiene un campo de titulo separado en el form.
-        const titulo = esOtro ? categoriaOtro : categoriaSeleccionada.nombre;
+        // Prioridad para el titulo: lo que escribio en el campo Titulo: si lo dejo
+        // vacio, lo que escribio al especificar "Otro"; si tampoco, el nombre de
+        // la categoria elegida.
+        const tituloFinal = titulo.trim()
+            ? titulo.trim()
+            : (esOtro && categoriaOtro.trim() ? categoriaOtro.trim() : categoriaSeleccionada.nombre);
 
         try {
             await dispatch(crearReclamo({
-                titulo,
+                titulo: tituloFinal,
                 descripcion: desc,
                 // No hay columnas de lat/lng en Reclamo, asi que las coordenadas
                 // se guardan como texto dentro de ubicacion.
@@ -113,6 +117,18 @@ const NuevoReporte = () => {
             )}
 
             <form onSubmit={handleSubmit}>
+
+                {/* TITULO (opcional) */}
+                <div className="field">
+                    <label htmlFor="titulo">Título (opcional)</label>
+                    <input
+                        type="text"
+                        id="titulo"
+                        placeholder="Ej: Bache grande esquina San Martín y Belgrano"
+                        value={titulo}
+                        onChange={(e) => setTitulo(e.target.value)}
+                    />
+                </div>
 
                 {/* ZONA */}
                 <div className="field">
