@@ -1,26 +1,59 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Icon from '../components/Icon';
 import LocationPicker from '../components/LocationPicker';
-
-const TIPOS_RECLAMO = ['Calle anegada', 'Corte de luz', 'Árbol caído', 'Calle inundada', 'Otro'];
+import api from '../api/client';
+import { crearReclamo } from '../features/reclamos/reclamosSlice';
 
 const NuevoReporte = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { crearStatus, crearError } = useSelector((state) => state.reclamos);
 
-    const [tipo, setTipo] = useState('');
-    const [tipoOtro, setTipoOtro] = useState(''); // <-- Nuevo estado para el input libre
+    // Zonas y categorias reales, traidas del back (antes eran una lista fija
+    // inventada en el front, que no correspondia a ninguna fila real de la BD).
+    const [zonas, setZonas] = useState([]);
+    const [categorias, setCategorias] = useState([]);
+    const [cargandoCatalogos, setCargandoCatalogos] = useState(true);
+    const [errorCatalogos, setErrorCatalogos] = useState(false);
+
+    const [zonaId, setZonaId] = useState('');
+    const [categoriaId, setCategoriaId] = useState('');
+    const [categoriaOtro, setCategoriaOtro] = useState('');
     const [desc, setDesc] = useState('');
     const [coordenadas, setCoordenadas] = useState(null);
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        let activo = true;
+        Promise.all([api.get('/api/zonas'), api.get('/api/categorias')])
+            .then(([resZonas, resCategorias]) => {
+                if (!activo) return;
+                setZonas(resZonas.data);
+                setCategorias(resCategorias.data);
+            })
+            .catch(() => {
+                if (activo) setErrorCatalogos(true);
+            })
+            .finally(() => {
+                if (activo) setCargandoCatalogos(false);
+            });
+        return () => { activo = false; };
+    }, []);
+
+    const categoriaSeleccionada = categorias.find((c) => String(c.id) === categoriaId);
+    const esOtro = categoriaSeleccionada?.nombre?.toLowerCase() === 'otro';
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validaciones
-        if (!tipo) {
+        if (!zonaId) {
+            alert('Por favor, seleccioná una zona.'); return;
+        }
+        if (!categoriaId) {
             alert('Por favor, seleccioná un tipo de problema.'); return;
         }
-        if (tipo === 'Otro' && tipoOtro.trim() === '') {
+        if (esOtro && categoriaOtro.trim() === '') {
             alert('Por favor, especificá de qué se trata el problema.'); return;
         }
         if (!coordenadas) {
@@ -30,55 +63,96 @@ const NuevoReporte = () => {
             alert('Por favor, agregá una descripción breve.'); return;
         }
 
-        // Si seleccionó "Otro", mandamos lo que escribió en el input. Si no, mandamos el botón que tocó.
-        const tipoFinal = tipo === 'Otro' ? tipoOtro : tipo;
+        // El titulo se arma solo: el nombre de la categoria, o lo que escribio
+        // si eligio "Otro". Reclamo no tiene un campo de titulo separado en el form.
+        const titulo = esOtro ? categoriaOtro : categoriaSeleccionada.nombre;
 
-        console.log("Datos para el Back:", {
-            tipo: tipoFinal,
-            lat: coordenadas.lat,
-            lng: coordenadas.lng,
-            desc
-        });
-
-        alert('¡Reporte enviado correctamente!');
-        navigate('/mis-reportes');
+        try {
+            await dispatch(crearReclamo({
+                titulo,
+                descripcion: desc,
+                // No hay columnas de lat/lng en Reclamo, asi que las coordenadas
+                // se guardan como texto dentro de ubicacion.
+                ubicacion: `Lat: ${coordenadas.lat}, Lng: ${coordenadas.lng}`,
+                zonaId: Number(zonaId),
+                categoriaId: Number(categoriaId),
+            })).unwrap();
+            alert('¡Reporte enviado correctamente!');
+            navigate('/mis-reportes');
+        } catch {
+            // El error ya queda en el estado (reclamosSlice) y se muestra abajo.
+        }
     };
+
+    if (cargandoCatalogos) {
+        return (
+            <div className="page-wrap">
+                <h1 className="page-title">Reportar un problema</h1>
+                <p>Cargando...</p>
+            </div>
+        );
+    }
+
+    if (errorCatalogos) {
+        return (
+            <div className="page-wrap">
+                <h1 className="page-title">Reportar un problema</h1>
+                <p>No se pudieron cargar las zonas y categorías. Intentá de nuevo más tarde.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="page-wrap">
             <h1 className="page-title">Reportar un problema</h1>
-        
+
+            {crearError && (
+                <p style={{ color: '#c0392b', fontSize: '.9rem', marginBottom: '1rem' }}>
+                    No se pudo enviar el reporte. Intentá de nuevo.
+                </p>
+            )}
 
             <form onSubmit={handleSubmit}>
 
-                {/* TIPO DE PROBLEMA */}
+                {/* ZONA */}
+                <div className="field">
+                    <label htmlFor="zona">Zona</label>
+                    <select id="zona" value={zonaId} onChange={(e) => setZonaId(e.target.value)} required>
+                        <option value="" disabled>Seleccioná una zona</option>
+                        {zonas.map((z) => (
+                            <option key={z.id} value={z.id}>{z.nombre}</option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* TIPO DE PROBLEMA (categorias reales) */}
                 <div className="field">
                     <label>Tipo de problema</label>
                     <div className="chip-select" role="group">
-                        {TIPOS_RECLAMO.map((t) => (
+                        {categorias.map((c) => (
                             <button
-                                key={t}
+                                key={c.id}
                                 type="button"
                                 className="chip-option"
-                                aria-pressed={tipo === t}
-                                onClick={() => setTipo(t)}
+                                aria-pressed={categoriaId === String(c.id)}
+                                onClick={() => setCategoriaId(String(c.id))}
                             >
-                                {t}
+                                {c.nombre}
                             </button>
                         ))}
                     </div>
                 </div>
 
                 {/* INPUT CONDICIONAL SI ELIGE "OTRO" */}
-                {tipo === 'Otro' && (
+                {esOtro && (
                     <div className="field" style={{ marginTop: '0.5rem', animation: 'fadeIn 0.3s' }}>
-                        <label htmlFor="tipo-otro">Especificá el problema</label>
+                        <label htmlFor="categoria-otro">Especificá el problema</label>
                         <input
                             type="text"
-                            id="tipo-otro"
+                            id="categoria-otro"
                             placeholder="Ej: Semáforo roto, caño de agua..."
-                            value={tipoOtro}
-                            onChange={(e) => setTipoOtro(e.target.value)}
+                            value={categoriaOtro}
+                            onChange={(e) => setCategoriaOtro(e.target.value)}
                             autoFocus
                         />
                     </div>
@@ -112,8 +186,8 @@ const NuevoReporte = () => {
                     </button>
                 </div>
 
-                <button type="submit" className="btn btn-primary btn-lg btn-block" style={{ marginTop: '1rem' }}>
-                    Enviar reporte
+                <button type="submit" className="btn btn-primary btn-lg btn-block" style={{ marginTop: '1rem' }} disabled={crearStatus === 'loading'}>
+                    {crearStatus === 'loading' ? 'Enviando...' : 'Enviar reporte'}
                 </button>
             </form>
         </div>

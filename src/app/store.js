@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import authReducer from '../features/auth/authSlice'
+import reclamosReducer from '../features/reclamos/reclamosSlice'
 import preferenciasReducer, {
     guardarPreferencias,
     leerPreferencias,
@@ -11,6 +12,7 @@ export const store = configureStore({
     reducer: {
         auth: authReducer,
         preferencias: preferenciasReducer,
+        reclamos: reclamosReducer,
     },
 })
 
