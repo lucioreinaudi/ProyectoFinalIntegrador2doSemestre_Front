@@ -1224,6 +1224,14 @@ main:focus {
     background: var(--superficie);
 }
 
+.field input:disabled,
+.field select:disabled,
+.field textarea:disabled {
+    background: var(--superficie-2);
+    color: var(--texto-3);
+    cursor: not-allowed;
+}
+
 .field textarea {
     resize: vertical;
     min-height: 5rem;
