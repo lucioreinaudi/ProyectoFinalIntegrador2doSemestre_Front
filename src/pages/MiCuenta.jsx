@@ -1,18 +1,25 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Icon from '../components/Icon';
+import { logout, selectUsuario } from '../features/auth/authSlice';
 
 const MiCuenta = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const usuario = useSelector(selectUsuario);
+
     const fileInputRef = useRef(null);
     const [avatar, setAvatar] = useState(null);
 
-    // 1. Sacamos direccion y barrio del estado inicial
+    // Datos reales del usuario logueado (antes era un mock fijo de "Ana Gomez").
     const [datos, setDatos] = useState({
-        nombre: 'Ana',
-        apellido: 'Gómez',
-        documento: '34567890',
-        fechaNacimiento: '1990-05-15',
-        email: 'ana.gomez@email.com',
-        telefono: '3385 55-0123'
+        nombre: usuario?.nombre || '',
+        apellido: usuario?.apellido || '',
+        documento: usuario?.documento || '',
+        fechaNacimiento: usuario?.fechaNacimiento || '',
+        email: usuario?.email || '',
+        telefono: usuario?.telefono || ''
     });
 
     const [passwords, setPasswords] = useState({
@@ -43,6 +50,8 @@ const MiCuenta = () => {
 
     const handleGuardarDatos = (e) => {
         e.preventDefault();
+        // TODO: no existe todavia un endpoint PUT /api/usuarios/{id} en el back.
+        // Falta esa card para que esto guarde datos de verdad.
         console.log("Datos a enviar al back:", { ...datos, avatarFile: fileInputRef.current.files ? fileInputRef.current.files[0] : null });
         alert('Datos personales y foto guardados correctamente.');
     };
@@ -53,10 +62,30 @@ const MiCuenta = () => {
             alert('Las contraseñas nuevas no coinciden.');
             return;
         }
+        // TODO: no existe todavia un endpoint para cambiar contraseña en el back.
         console.log("Enviando nueva contraseña al back...");
         alert('Contraseña actualizada con éxito.');
         setPasswords({ actual: '', nueva: '', repetir: '' });
     };
+
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate('/');
+    };
+
+    // Guard minimo: esta pagina asume que hay sesion (el TopBar/BottomNav ya ocultan
+    // el link si no la hay), pero las rutas en si todavia no estan protegidas, asi
+    // que alguien podria entrar a /cuenta escribiendo la URL sin estar logueado.
+    if (!usuario) {
+        return (
+            <div className="page-wrap">
+                <h1 className="page-title">Mi cuenta</h1>
+                <div className="card-box">
+                    <p>Tenés que iniciar sesión para ver esta página.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="page-wrap">
@@ -86,7 +115,6 @@ const MiCuenta = () => {
 
                     <div>
                         <strong style={{ display: 'block', fontSize: '1.15rem' }}>{datos.nombre} {datos.apellido}</strong>
-                        {/* 2. Eliminamos el span que mostraba el barrio acá */}
 
                         <input
                             type="file"
@@ -144,8 +172,6 @@ const MiCuenta = () => {
                         </div>
                     </div>
 
-                    {/* 3. Eliminamos por completo el bloque que contenía los inputs de Dirección y Barrio */}
-
                     <button type="submit" className="btn btn-primary btn-block" style={{ marginTop: '.5rem' }}>
                         Guardar cambios
                     </button>
@@ -181,9 +207,9 @@ const MiCuenta = () => {
             <button
                 className="btn btn-block"
                 style={{ marginTop: '1.5rem', color: 'var(--alto-icono)', backgroundColor: 'var(--alto-bg)' }}
-                onClick={() => alert('Cerrando sesión...')}
+                onClick={handleLogout}
             >
-                <Icon name="x" size={18} /> Cerrar sesión
+                <Icon name="logout" size={18} /> Cerrar sesión
             </button>
         </div>
     );
