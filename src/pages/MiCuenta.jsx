@@ -1,18 +1,29 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Icon from '../components/Icon';
+import { actualizarPerfil, cambiarPassword, logout, selectUsuario } from '../features/auth/authSlice';
 
 const MiCuenta = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const usuario = useSelector(selectUsuario);
+    const { perfilStatus, perfilError, passwordStatus, passwordError } = useSelector((state) => state.auth);
+
     const fileInputRef = useRef(null);
     const [avatar, setAvatar] = useState(null);
 
-    // 1. Sacamos direccion y barrio del estado inicial
+    // Datos reales del usuario logueado. zonaId no se edita desde este formulario
+    // (no hay selector de zona aca), pero se guarda igual para mandarlo de vuelta
+    // en el PUT: si no se manda, el back la borra (es un PUT, reemplaza todo).
     const [datos, setDatos] = useState({
-        nombre: 'Ana',
-        apellido: 'Gómez',
-        documento: '34567890',
-        fechaNacimiento: '1990-05-15',
-        email: 'ana.gomez@email.com',
-        telefono: '3385 55-0123'
+        nombre: usuario?.nombre || '',
+        apellido: usuario?.apellido || '',
+        documento: usuario?.documento || '',
+        fechaNacimiento: usuario?.fechaNacimiento || '',
+        email: usuario?.email || '',
+        telefono: usuario?.telefono || '',
+        zonaId: usuario?.zonaId ?? null
     });
 
     const [passwords, setPasswords] = useState({
@@ -41,22 +52,54 @@ const MiCuenta = () => {
         setPasswords({ ...passwords, [e.target.name]: e.target.value });
     };
 
-    const handleGuardarDatos = (e) => {
+    const handleGuardarDatos = async (e) => {
         e.preventDefault();
-        console.log("Datos a enviar al back:", { ...datos, avatarFile: fileInputRef.current.files ? fileInputRef.current.files[0] : null });
-        alert('Datos personales y foto guardados correctamente.');
+        // email no va: el back ni lo acepta (UsuarioActualizarRequest no tiene ese campo).
+        const { email, ...datosParaEnviar } = datos;
+        try {
+            await dispatch(actualizarPerfil(datosParaEnviar)).unwrap();
+            alert('Datos personales guardados correctamente.');
+        } catch {
+            // El error ya queda en el estado (authSlice) y se muestra abajo.
+        }
     };
 
-    const handleCambiarPassword = (e) => {
+    const handleCambiarPassword = async (e) => {
         e.preventDefault();
         if (passwords.nueva !== passwords.repetir) {
             alert('Las contraseñas nuevas no coinciden.');
             return;
         }
-        console.log("Enviando nueva contraseña al back...");
-        alert('Contraseña actualizada con éxito.');
-        setPasswords({ actual: '', nueva: '', repetir: '' });
+        try {
+            await dispatch(cambiarPassword({
+                passwordActual: passwords.actual,
+                passwordNueva: passwords.nueva
+            })).unwrap();
+            alert('Contraseña actualizada con éxito.');
+            setPasswords({ actual: '', nueva: '', repetir: '' });
+        } catch {
+            // El error ya queda en el estado (authSlice) y se muestra abajo.
+        }
     };
+
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate('/');
+    };
+
+    // Guard minimo: esta pagina asume que hay sesion (el TopBar/BottomNav ya ocultan
+    // el link si no la hay), pero las rutas en si todavia no estan protegidas, asi
+    // que alguien podria entrar a /cuenta escribiendo la URL sin estar logueado.
+    if (!usuario) {
+        return (
+            <div className="page-wrap">
+                <h1 className="page-title">Mi cuenta</h1>
+                <div className="card-box">
+                    <p>Tenés que iniciar sesión para ver esta página.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="page-wrap">
@@ -86,7 +129,6 @@ const MiCuenta = () => {
 
                     <div>
                         <strong style={{ display: 'block', fontSize: '1.15rem' }}>{datos.nombre} {datos.apellido}</strong>
-                        {/* 2. Eliminamos el span que mostraba el barrio acá */}
 
                         <input
                             type="file"
@@ -109,6 +151,12 @@ const MiCuenta = () => {
                 <h2 style={{ fontSize: '1.05rem', marginBottom: '1rem', borderBottom: '1px solid var(--borde)', paddingBottom: '.5rem' }}>
                     Datos Personales
                 </h2>
+
+                {perfilError && (
+                    <p style={{ color: '#c0392b', fontSize: '.85rem', marginBottom: '1rem' }}>
+                        No se pudieron guardar los cambios. Intentá de nuevo.
+                    </p>
+                )}
 
                 <form onSubmit={handleGuardarDatos}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0 1rem' }}>
@@ -136,7 +184,7 @@ const MiCuenta = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0 1rem' }}>
                         <div className="field">
                             <label htmlFor="email">Correo electrónico</label>
-                            <input type="email" id="email" name="email" value={datos.email} onChange={handleChange} required />
+                            <input type="email" id="email" name="email" value={datos.email} disabled title="El email no se puede modificar" />
                         </div>
                         <div className="field">
                             <label htmlFor="telefono">Teléfono</label>
@@ -144,10 +192,8 @@ const MiCuenta = () => {
                         </div>
                     </div>
 
-                    {/* 3. Eliminamos por completo el bloque que contenía los inputs de Dirección y Barrio */}
-
-                    <button type="submit" className="btn btn-primary btn-block" style={{ marginTop: '.5rem' }}>
-                        Guardar cambios
+                    <button type="submit" className="btn btn-primary btn-block" style={{ marginTop: '.5rem' }} disabled={perfilStatus === 'loading'}>
+                        {perfilStatus === 'loading' ? 'Guardando...' : 'Guardar cambios'}
                     </button>
                 </form>
             </div>
@@ -157,6 +203,11 @@ const MiCuenta = () => {
                 <h2 style={{ fontSize: '1.05rem', marginBottom: '1rem', borderBottom: '1px solid var(--borde)', paddingBottom: '.5rem' }}>
                     Seguridad
                 </h2>
+                {passwordError && (
+                    <p style={{ color: '#c0392b', fontSize: '.85rem', marginBottom: '1rem' }}>
+                        {passwordError === 400 ? 'La contraseña actual es incorrecta.' : 'No se pudo actualizar la contraseña. Intenta de nuevo.'}
+                    </p>
+                )}
                 <form onSubmit={handleCambiarPassword}>
                     <div className="field">
                         <label htmlFor="actual">Contraseña actual</label>
@@ -172,8 +223,8 @@ const MiCuenta = () => {
                             <input type="password" id="repetir" name="repetir" value={passwords.repetir} onChange={handlePassChange} required />
                         </div>
                     </div>
-                    <button type="submit" className="btn btn-outline btn-block" style={{ marginTop: '.5rem' }}>
-                        Actualizar contraseña
+                    <button type="submit" className="btn btn-outline btn-block" style={{ marginTop: '.5rem' }} disabled={passwordStatus === 'loading'}>
+                        {passwordStatus === 'loading' ? 'Actualizando...' : 'Actualizar contraseña'}
                     </button>
                 </form>
             </div>
@@ -181,9 +232,9 @@ const MiCuenta = () => {
             <button
                 className="btn btn-block"
                 style={{ marginTop: '1.5rem', color: 'var(--alto-icono)', backgroundColor: 'var(--alto-bg)' }}
-                onClick={() => alert('Cerrando sesión...')}
+                onClick={handleLogout}
             >
-                <Icon name="x" size={18} /> Cerrar sesión
+                <Icon name="logout" size={18} /> Cerrar sesión
             </button>
         </div>
     );

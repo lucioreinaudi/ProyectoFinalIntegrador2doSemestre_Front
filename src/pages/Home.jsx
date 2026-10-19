@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Icon from '../components/Icon';
@@ -29,7 +29,55 @@ const Home = () => {
     const [filtroZona, setFiltroZona] = useState('todas');
     const [filtroNivel, setFiltroNivel] = useState('todos');
 
-    // Ver mis reportes solo tiene sentido con sesion iniciada (completa SCRUM-52).
+    // Estado para la información del clima
+    const [clima, setClima] = useState({
+        temperatura: '--',
+        condicion: 'Cargando...',
+        humedad: 0,
+        iconoName: 'cloud-rain'
+    });
+
+    // Función auxiliar para mapear la condición al icono correspondiente
+    const obtenerIconoClima = (condicionText, esDeDia) => {
+        if (!condicionText) return 'cloud-rain';
+        const cond = condicionText.toLowerCase();
+
+        if (cond.includes('despejado')) {return esDeDia ? 'sun' : 'moon';}
+        if (cond.includes('tormenta')) {return 'zap';}
+        if (cond.includes('viento')) {return 'wind';}
+        return 'cloud-rain';
+    };
+
+    // Llamada al endpoint del clima en el backend
+    useEffect(() => {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+        fetch('http://localhost:8080/api/clima/actual', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Error al obtener el clima');
+                return res.json();
+            })
+            .then(data => {
+                setClima({
+                    temperatura: data.temperatura || '--',
+                    condicion: data.condicion || 'Desconocido',
+                    humedad: data.humedad || 0,
+                    iconoName: obtenerIconoClima(data.condicion, data.esDeDia)
+                });
+            })
+            .catch(err => {
+                console.error("Error al cargar clima:", err);
+                setClima(prev => ({ ...prev, condicion: 'No disponible' }));
+            });
+    }, []);
+
+    // Ver mis reportes solo tiene sentido con sesion iniciada
     const accionesVisibles = ACCIONES_RAPIDAS.filter(a => a.ruta !== '/mis-reportes' || estaLogueado);
 
     // Logica de filtrado
@@ -51,13 +99,13 @@ const Home = () => {
                             <p>Información oficial para estar conectados con nuestra ciudad. Consultá las alertas activas, recibí recomendaciones y reportá problemas en tu zona.</p>
                         </div>
                         <div className="weather-card">
-                            <span className="wi"><Icon name="cloud-rain" size={40} /></span>
+                            <span className="wi"><Icon name={clima.iconoName} size={40} /></span>
                             <div>
                                 <div className="loc">Laboulaye</div>
-                                <strong>18°C</strong>
-                                <div className="desc">Lluvias</div>
+                                <strong>{clima.temperatura}</strong>
+                                <div className="desc">{clima.condicion}</div>
                             </div>
-                            <div className="weather-minmax">Máx. 22°<br />Mín. 16°</div>
+                            <div className="weather-minmax">Humedad<br />{clima.humedad}%</div>
                         </div>
                     </div>
                 </div>
