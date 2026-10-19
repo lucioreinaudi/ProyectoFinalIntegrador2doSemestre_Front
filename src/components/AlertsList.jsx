@@ -13,7 +13,7 @@ const NIVEL_LABEL = { alto: 'Nivel alto', medio: 'Precaución', bajo: 'Informati
 
 const FotoAlerta = ({ alerta: a }) => {
     const [falla, setFalla] = useState(false);
-    // Foto real subida por el municipio (sin tinte); si no hay, la de referencia con tinte del nivel.
+    // Foto real subida por el municipio; si no hay, la de referencia por tipo.
     const src = a.imagenUrl || FOTO_REFERENCIA[a.foto];
     const esReferencia = !a.imagenUrl;
 
