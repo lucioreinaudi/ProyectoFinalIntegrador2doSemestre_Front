@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import TopBar from './components/TopBar';
 import BottomNav from './components/BottomNav';
 import Home from './pages/Home';
+import Alertas from './pages/Alertas';
 import NuevoReporte from './pages/NuevoReporte';
 import MisReportes from './pages/MisReportes';
 import MiCuenta from './pages/MiCuenta';
@@ -25,6 +26,7 @@ function App() {
             <main id="contenido-principal" tabIndex={-1}>
                 <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route path="/alertas" element={<Alertas />} />
                     <Route path="/reporte" element={<NuevoReporte />} />
                     <Route path="/mis-reportes" element={<MisReportes />} />
                     <Route path="/cuenta" element={<MiCuenta />} />
