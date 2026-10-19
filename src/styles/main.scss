@@ -711,11 +711,11 @@ main:focus {
     flex-wrap: wrap;
 }
 
-/* ---------------- CONTACTOS ---------------- */
+/* ---------------- CONTACTOS (OPCIÓN D: CARDS LLAMATIVAS) ---------------- */
 .contact-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: .85rem;
+    gap: 1rem;
 }
 
 @media (min-width: 560px) {
@@ -724,85 +724,129 @@ main:focus {
     }
 }
 
+/* Base de la tarjeta vertical */
 .contact-card {
-    border-radius: var(--radius-m);
-    padding: 1rem .9rem;
+    position: relative;
+    border-radius: 16px;
+    padding: 1.5rem 1rem;
     display: flex;
     flex-direction: column;
-    gap: .5rem;
-    border: 1px solid transparent;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    gap: 0.8rem;
+    min-height: 180px;
+    text-decoration: none;
+    border: 2px solid transparent;
+    cursor: pointer;
+    overflow: hidden;
+
+    /* Transición de la tarjeta */
+    transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                box-shadow 0.35s ease, 
+                border-color 0.35s ease;
 }
 
+/* Contenedor del ícono (sin fondo que tape) */
 .contact-card .ci {
-    width: 2.6rem;
-    height: 2.6rem;
-    border-radius: 50%;
+    width: auto;
+    height: auto;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--icono-fondo);
 }
 
+/* Ícono SVG limpio */
 .contact-card .ci svg {
-    width: 1.4rem;
-    height: 1.4rem;
+    width: 3.2rem;
+    height: 3.2rem;
+    fill: #ffffff;
+    /* Transición elástica aplicada directamente al SVG */
+    transition: transform 0.4s cubic-bezier(0.34, 1.75, 0.64, 1);
 }
 
-.contact-card.bomberos {
-    background: var(--alto-bg);
-    border-color: var(--alto-borde);
-    color: var(--alto-texto);
-}
-
-.contact-card.bomberos .ci {
-    color: var(--alto-icono);
-}
-
-.contact-card.policia {
-    background: var(--info-bg);
-    border-color: var(--info-borde);
-    color: var(--info-texto);
-}
-
-.contact-card.policia .ci {
-    color: var(--brand-1);
-}
-
-.contact-card.hospital {
-    background: var(--bajo-bg);
-    border-color: var(--bajo-borde);
-    color: var(--bajo-texto);
-}
-
-.contact-card.hospital .ci {
-    color: var(--bajo-icono);
-}
-
-.contact-card.municipio {
-    background: var(--superficie-2);
-    border-color: var(--borde);
-    color: var(--texto-1);
-}
-
-.contact-card.municipio .ci {
-    color: var(--texto-2);
-}
-
+/* Etiqueta / Nombre */
 .contact-card strong {
-    font-size: .94rem;
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #ffffff;
 }
 
+/* Número de teléfono */
 .contact-card .tel {
     display: flex;
     align-items: center;
-    gap: .3rem;
-    font-weight: 800;
-    font-size: .9rem;
+    justify-content: center;
+    gap: 0.4rem;
+    font-weight: 900;
+    font-size: 2rem;
+    line-height: 1;
+    color: #ffffff;
 }
 
 .contact-card .tel svg {
-    width: 1rem;
-    height: 1rem;
+    width: 1.3rem;
+    height: 1.3rem;
+    fill: currentColor;
+}
+
+/* ==========================================
+   EFECTO HOVER (CRECIMIENTO LIMPIO DEL SÍMBOLO)
+========================================== */
+.contact-card:hover {
+    transform: translateY(-8px);
+}
+
+/* Escala directamente el SVG sin superponer ningún círculo */
+.contact-card:hover .ci svg {
+    transform: scale(1.35) translateY(-2px);
+}
+
+/* ==========================================
+   COLORES VIVOS Y GLOW POR CATEGORÍA
+========================================== */
+
+/* Policía (Azul) */
+.contact-card.policia {
+    background: linear-gradient(180deg, #0062cc 0%, #004599 100%);
+    box-shadow: 0 6px 15px rgba(0, 98, 204, 0.3);
+}
+.contact-card.policia:hover {
+    border-color: #ffffff;
+    box-shadow: 0 12px 28px rgba(0, 98, 204, 0.55);
+}
+
+/* Bomberos (Rojo) */
+.contact-card.bomberos {
+    background: linear-gradient(180deg, #d32f2f 0%, #9a0007 100%);
+    box-shadow: 0 6px 15px rgba(211, 47, 47, 0.3);
+}
+.contact-card.bomberos:hover {
+    border-color: #ffffff;
+    box-shadow: 0 12px 28px rgba(211, 47, 47, 0.55);
+}
+
+/* Salud / Hospital (Verde) */
+.contact-card.hospital {
+    background: linear-gradient(180deg, #00897b 0%, #004d40 100%);
+    box-shadow: 0 6px 15px rgba(0, 137, 123, 0.3);
+}
+.contact-card.hospital:hover {
+    border-color: #ffffff;
+    box-shadow: 0 12px 28px rgba(0, 137, 123, 0.55);
+}
+
+/* Municipio / Gobierno (Naranja) */
+.contact-card.municipio {
+    background: linear-gradient(180deg, #f57c00 0%, #b26a00 100%);
+    box-shadow: 0 6px 15px rgba(245, 124, 0, 0.3);
+}
+.contact-card.municipio:hover {
+    border-color: #ffffff;
+    box-shadow: 0 12px 28px rgba(245, 124, 0, 0.55);
 }
 
 /* ---------------- ACCIONES RÁPIDAS ---------------- */
@@ -1253,8 +1297,6 @@ main:focus {
     outline: none;
     border-color: var(--brand-1);
 }
-
-
 
 .field select:disabled {
     cursor: not-allowed;
