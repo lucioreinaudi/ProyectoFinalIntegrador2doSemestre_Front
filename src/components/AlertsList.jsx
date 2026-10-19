@@ -1,7 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Icon from './Icon';
 
+// Foto de referencia por tipo de alerta (cambiar una = reemplazar el archivo en public/img/alertas/)
+const FOTO_REFERENCIA = {
+    'cloud-rain': '/img/alertas/tormenta.jpg',
+    wind: '/img/alertas/viento.jpg',
+    zap: '/img/alertas/electricidad.jpg',
+    tree: '/img/alertas/arbol.jpg',
+};
+
 const NIVEL_LABEL = { alto: 'Nivel alto', medio: 'Precaución', bajo: 'Informativo' };
+
+const FotoAlerta = ({ alerta: a }) => {
+    const [falla, setFalla] = useState(false);
+    // Foto real subida por el municipio (sin tinte); si no hay, la de referencia con tinte del nivel.
+    const src = a.imagenUrl || FOTO_REFERENCIA[a.foto];
+    const esReferencia = !a.imagenUrl;
+
+    if (!src || falla) {
+        return (
+            <div className={`af-photo nivel-${a.nivel}`}>
+                <Icon name={a.foto || 'alert-triangle'} size={80} />
+                <span className="cap">Imagen ilustrativa</span>
+            </div>
+        );
+    }
+    return (
+        <div className={`af-photo con-foto nivel-${a.nivel}`}>
+            <img src={src} alt={esReferencia ? '' : a.titulo} loading="lazy" onError={() => setFalla(true)} />
+            <span className="cap">{esReferencia ? 'Imagen de referencia' : 'Foto de la zona'}</span>
+        </div>
+    );
+};
 
 const AlertsList = ({ alertas }) => {
     // Si no hay alertas para el filtro, mostramos que está todo bien
@@ -42,10 +72,7 @@ const AlertsList = ({ alertas }) => {
                             Ver alerta completa <Icon name="arrow-right" size={16} />
                         </button>
                     </div>
-                    <div className={`af-photo nivel-${a.nivel}`}>
-                        <Icon name={a.foto || 'alert-triangle'} size={80} />
-                        <span className="cap">Imagen ilustrativa</span>
-                    </div>
+                    <FotoAlerta alerta={a} />
                 </div>
             ))}
         </div>
