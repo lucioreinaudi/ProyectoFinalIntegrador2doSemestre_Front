@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
 import Icon from '../components/Icon';
+import PanelReclamos from '../components/admin/PanelReclamos';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('reclamos');
 
   // --- DATOS SIMULADOS ---
-  const [reclamos] = useState([
-    { id: 1, titulo: 'Bache profundo (Otro)', categoria: 'Otro', zona: 'Centro', estado: 'recibido', publicado: false, fecha: '14/10/2026', vecino: 'Juan Pérez' },
-    { id: 2, titulo: 'Luminaria rota', categoria: 'Alumbrado', zona: 'Norte', estado: 'en proceso', publicado: false, fecha: '13/10/2026', vecino: 'María López' },
-    { id: 3, titulo: 'Basura acumulada', categoria: 'Limpieza', zona: 'Sur', estado: 'rechazado', publicado: false, fecha: '10/10/2026', vecino: 'Carlos Díaz' }
-  ]);
-
   const [alertas, setAlertas] = useState([
     { id: 1, titulo: 'Corte por bacheo', nivelGravedad: 'medio', zona: 'Centro', fechaEmision: '14/10/2026', estado: 'activa' },
     { id: 2, titulo: 'Alerta de Tormenta', nivelGravedad: 'alto', zona: 'Todas', fechaEmision: '12/10/2026', estado: 'finalizada' }
@@ -80,57 +75,10 @@ const AdminPanel = () => {
       </div>
 
       {/* ==================== RECLAMOS ==================== */}
+      {/* Conectada al back (SCRUM-81). El resto de las pestanas sigue siendo maqueta. */}
       {activeTab === 'reclamos' && (
         <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <h2 style={{ fontSize: '1.2rem', margin: 0 }}>Gestión de Reclamos</h2>
-            
-            {/* FILTROS CORREGIDOS PARA MODO OSCURO */}
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <select style={{ margin: 0, padding: '0.4rem 0.6rem', backgroundColor: 'var(--superficie)', color: 'var(--texto-1)', border: '1px solid var(--borde)', borderRadius: '4px', outline: 'none' }}>
-                <option value="">Todos los estados</option>
-                <option value="recibido">Recibidos</option>
-                <option value="en revision">En revisión</option>
-                <option value="en proceso">En proceso</option>
-                <option value="resuelto">Resueltos</option>
-                <option value="rechazado">Rechazados</option>
-              </select>
-              <select style={{ margin: 0, padding: '0.4rem 0.6rem', backgroundColor: 'var(--superficie)', color: 'var(--texto-1)', border: '1px solid var(--borde)', borderRadius: '4px', outline: 'none' }}>
-                <option value="">Todas las zonas</option>
-                <option value="Centro">Centro</option>
-                <option value="Norte">Norte</option>
-              </select>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.9rem', color: 'var(--texto-1)' }}>
-                <input type="checkbox" /> Solo "(Otro)"
-              </label>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-            {reclamos.map(reclamo => (
-              <div key={reclamo.id} className="card-box" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
-                    <strong style={{ color: 'var(--texto-1)', fontSize: '1.05rem' }}>{reclamo.titulo}</strong>
-                    {reclamo.publicado && <span style={{ background: '#ecfdf5', color: '#10b981', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>Publicado</span>}
-                  </div>
-                  <span style={{ display: 'block', fontSize: '0.85rem', color: 'var(--texto-2)' }}>
-                    {reclamo.fecha} | Vecino: {reclamo.vecino} | Zona: {reclamo.zona} | Cat: {reclamo.categoria}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <span style={{ 
-                    padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'capitalize',
-                    background: reclamo.estado === 'recibido' ? '#f1f5f9' : reclamo.estado === 'resuelto' ? '#ecfdf5' : reclamo.estado === 'rechazado' ? '#fef2f2' : '#eff6ff',
-                    color: reclamo.estado === 'recibido' ? '#475569' : reclamo.estado === 'resuelto' ? '#10b981' : reclamo.estado === 'rechazado' ? '#ef4444' : '#3b82f6'
-                  }}>
-                    {reclamo.estado}
-                  </span>
-                  <button className="btn btn-outline" style={{ padding: '0.3rem 0.8rem', fontSize: '0.85rem' }}>Atender</button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <PanelReclamos />
         </div>
       )}
 
