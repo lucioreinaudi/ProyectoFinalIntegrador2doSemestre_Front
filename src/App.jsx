@@ -9,6 +9,8 @@ import MisReportes from './pages/MisReportes';
 import MiCuenta from './pages/MiCuenta';
 import InfoUtil from './pages/InfoUtil';
 import AdminPanel from './pages/AdminPanel';
+import RutaProtegida from './components/RutaProtegida';
+import { ROL_MUNICIPIO } from './features/auth/rutasPorRol';
 import useAplicarPreferencias from './features/preferencias/useAplicarPreferencias';
 
 // 1. Importamos las páginas de acceso
@@ -31,7 +33,8 @@ function App() {
                     <Route path="/mis-reportes" element={<MisReportes />} />
                     <Route path="/cuenta" element={<MiCuenta />} />
                     <Route path="/info" element={<InfoUtil />} />
-                    <Route path="/admin" element={<AdminPanel />} />
+                    {/* El panel es solo para el municipio (sin sesion -> login, vecino -> Home) */}
+                    <Route path="/admin" element={<RutaProtegida rol={ROL_MUNICIPIO}><AdminPanel /></RutaProtegida>} />
 
                     {/* 2. Agregamos las rutas */}
                     <Route path="/login" element={<Login />} />
