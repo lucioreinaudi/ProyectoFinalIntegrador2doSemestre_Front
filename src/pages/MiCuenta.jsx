@@ -87,9 +87,9 @@ const MiCuenta = () => {
         navigate('/');
     };
 
-    // Guard minimo: esta pagina asume que hay sesion (el TopBar/BottomNav ya ocultan
-    // el link si no la hay), pero las rutas en si todavia no estan protegidas, asi
-    // que alguien podria entrar a /cuenta escribiendo la URL sin estar logueado.
+    // La ruta ya esta protegida con RutaProtegida (App.jsx). Este chequeo queda
+    // solo como resguardo, por si el usuario desaparece del estado mientras se
+    // muestra la pagina (ej. al cerrar sesion).
     if (!usuario) {
         return (
             <div className="page-wrap">
