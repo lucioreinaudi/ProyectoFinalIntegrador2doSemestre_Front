@@ -65,6 +65,17 @@ export function alertaParaVista(a) {
     }
 }
 
+// Orden de las alertas publicas: primero las mas graves (alto, medio, bajo) y,
+// dentro de cada nivel, las mas nuevas. Asi lo urgente siempre queda arriba,
+// aunque se muestren pocas (ver "Mostrar mas" en AlertsList).
+const PESO_NIVEL = { alto: 0, medio: 1, bajo: 2 }
+
+export function ordenarPorPrioridad(alertas) {
+    return [...alertas].sort((a, b) =>
+        (PESO_NIVEL[a.nivel] ?? 3) - (PESO_NIVEL[b.nivel] ?? 3) ||
+        new Date(b.fechaEmision) - new Date(a.fechaEmision))
+}
+
 // Datos vacios del formulario de alerta.
 export const ALERTA_VACIA = {
     titulo: '', descripcion: '', nivelGravedad: 'medio', tipo: 'otro', recomendaciones: '', zonaId: '', imagenUrl: null,

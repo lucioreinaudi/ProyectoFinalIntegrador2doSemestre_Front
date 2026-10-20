@@ -35,7 +35,13 @@ export const FotoAlerta = ({ alerta: a }) => {
     );
 };
 
-const AlertsList = ({ alertas, cargando = false, error = false }) => {
+// cantidadInicial: cuantas mostrar de entrada (sin ella, se muestran todas).
+// "Mostrar mas" suma esa misma cantidad cada vez, para que la pagina no se haga
+// larguisima si hay muchas alertas activas. Quien la usa le pasa un key que
+// cambia con los filtros, asi al filtrar vuelve a la cantidad inicial.
+const AlertsList = ({ alertas, cargando = false, error = false, cantidadInicial }) => {
+    const [visibles, setVisibles] = useState(cantidadInicial ?? Infinity);
+
     if (cargando) {
         return <p style={{ color: 'var(--texto-3)' }}>Cargando alertas...</p>;
     }
@@ -60,7 +66,7 @@ const AlertsList = ({ alertas, cargando = false, error = false }) => {
 
     return (
         <div className="alertas-list" style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-            {alertas.map((a) => (
+            {alertas.slice(0, visibles).map((a) => (
                 <div className={`alert-feature nivel-${a.nivel}`} key={a.id}>
                     <div>
                         <div className="af-head">
@@ -86,6 +92,16 @@ const AlertsList = ({ alertas, cargando = false, error = false }) => {
                     <FotoAlerta alerta={a} />
                 </div>
             ))}
+
+            {alertas.length > visibles && (
+                <button
+                    type="button"
+                    className="btn btn-outline mostrar-mas"
+                    onClick={() => setVisibles((v) => v + cantidadInicial)}
+                >
+                    Mostrar más (quedan {alertas.length - visibles})
+                </button>
+            )}
         </div>
     );
 };

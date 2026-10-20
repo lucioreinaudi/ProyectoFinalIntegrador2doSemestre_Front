@@ -166,7 +166,14 @@ const Home = () => {
                     </div>
 
                     {/* Renderizamos el componente pasándole las alertas ya filtradas */}
-                    <AlertsList alertas={alertasFiltradas} cargando={cargandoAlertas} error={errorAlertas} />
+                    {/* De a 3: el Home es un vistazo rapido. El key reinicia "Mostrar mas" al cambiar un filtro */}
+                    <AlertsList
+                        key={`${filtroZona}-${filtroNivel}`}
+                        alertas={alertasFiltradas}
+                        cargando={cargandoAlertas}
+                        error={errorAlertas}
+                        cantidadInicial={3}
+                    />
                 </div>
 
                 {/* ACCIONES RÁPIDAS */}

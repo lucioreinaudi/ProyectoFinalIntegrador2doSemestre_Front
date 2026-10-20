@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import api from '../../api/client'
-import { alertaParaVista } from './alertas'
+import { alertaParaVista, ordenarPorPrioridad } from './alertas'
 
 // Alertas activas para el Home y /alertas (GET /api/alertas/estado/activa, publico:
 // se ven sin login). Las zonas del filtro salen de las mismas alertas, asi no hace
-// falta pedir /api/zonas (que todavia exige sesion).
+// falta pedir /api/zonas (que todavia exige sesion). Vienen ordenadas por prioridad.
 export default function useAlertasActivas() {
     const [estado, setEstado] = useState({ cargando: true, error: false, alertas: [] })
 
@@ -12,7 +12,7 @@ export default function useAlertasActivas() {
         let activo = true
         api.get('/api/alertas/estado/activa')
             .then((res) => {
-                if (activo) setEstado({ cargando: false, error: false, alertas: res.data.map(alertaParaVista) })
+                if (activo) setEstado({ cargando: false, error: false, alertas: ordenarPorPrioridad(res.data.map(alertaParaVista)) })
             })
             .catch(() => {
                 if (activo) setEstado({ cargando: false, error: true, alertas: [] })

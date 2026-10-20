@@ -38,7 +38,14 @@ const Alertas = () => {
                 </div>
             </div>
 
-            <AlertsList alertas={alertasFiltradas} cargando={cargando} error={error} />
+            {/* De a 10. El key reinicia "Mostrar mas" al cambiar un filtro */}
+            <AlertsList
+                key={`${filtroZona}-${filtroNivel}`}
+                alertas={alertasFiltradas}
+                cargando={cargando}
+                error={error}
+                cantidadInicial={10}
+            />
         </div>
     );
 };
