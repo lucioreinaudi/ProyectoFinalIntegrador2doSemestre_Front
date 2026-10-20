@@ -3,12 +3,13 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from './Icon';
 import PanelAccesibilidad from './PanelAccesibilidad';
-import { logout, selectEstaLogueado, selectUsuario } from '../features/auth/authSlice';
+import { logout, selectEsMunicipio, selectEstaLogueado, selectUsuario } from '../features/auth/authSlice';
 import { alternarTema, selectTema } from '../features/preferencias/preferenciasSlice';
 
 const TopBar = () => {
     const estaLogueado = useSelector(selectEstaLogueado);
     const usuario = useSelector(selectUsuario);
+    const esMunicipio = useSelector(selectEsMunicipio);
     const esOscuro = useSelector(selectTema) === 'oscuro';
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -98,17 +99,31 @@ const TopBar = () => {
                 </div>
 
                 {/* NAVEGACIÓN DESKTOP */}
+                {/* El municipio no reporta ni tiene "mis reportes": ve su panel y la pagina publica */}
                 <nav className="top-nav" aria-label="Navegación principal">
-                    <NavLink to="/" className={({ isActive }) => isActive ? 'active-link' : ''}>
-                        <Icon name="home" size={18} /><span>Inicio</span>
-                    </NavLink>
-                    <NavLink to="/reporte" className={({ isActive }) => isActive ? 'active-link' : ''}>
-                        <Icon name="plus" size={18} /><span>Reportar problema</span>
-                    </NavLink>
-                    {estaLogueado && (
-                        <NavLink to="/mis-reportes" className={({ isActive }) => isActive ? 'active-link' : ''}>
-                            <Icon name="list" size={18} /><span>Mis reportes</span>
-                        </NavLink>
+                    {esMunicipio ? (
+                        <>
+                            <NavLink to="/admin" className={({ isActive }) => isActive ? 'active-link' : ''}>
+                                <Icon name="building" size={18} /><span>Panel</span>
+                            </NavLink>
+                            <NavLink to="/" end className={({ isActive }) => isActive ? 'active-link' : ''}>
+                                <Icon name="home" size={18} /><span>Página pública</span>
+                            </NavLink>
+                        </>
+                    ) : (
+                        <>
+                            <NavLink to="/" className={({ isActive }) => isActive ? 'active-link' : ''}>
+                                <Icon name="home" size={18} /><span>Inicio</span>
+                            </NavLink>
+                            <NavLink to="/reporte" className={({ isActive }) => isActive ? 'active-link' : ''}>
+                                <Icon name="plus" size={18} /><span>Reportar problema</span>
+                            </NavLink>
+                            {estaLogueado && (
+                                <NavLink to="/mis-reportes" className={({ isActive }) => isActive ? 'active-link' : ''}>
+                                    <Icon name="list" size={18} /><span>Mis reportes</span>
+                                </NavLink>
+                            )}
+                        </>
                     )}
                 </nav>
 
@@ -124,21 +139,35 @@ const TopBar = () => {
                         <Icon name={esOscuro ? 'sun' : 'moon'} />
                     </button>
                     <PanelAccesibilidad />
-                    <button className="icon-btn" title="Notificaciones">
-                        <Icon name="bell" />
-                        <span className="badge-dot">3</span>
-                    </button>
+                    {/* Las notificaciones son del vecino (cambios en sus reclamos); el municipio no recibe */}
+                    {!esMunicipio && (
+                        <button className="icon-btn" title="Notificaciones">
+                            <Icon name="bell" />
+                            <span className="badge-dot">3</span>
+                        </button>
+                    )}
 
                     {/* LÓGICA DE INGRESO / USUARIO LOGUEADO */}
                     <div style={{ display: 'flex', alignItems: 'center', marginLeft: '0.5rem', paddingLeft: '0.5rem', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
                         {estaLogueado ? (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                <Link to="/cuenta" className="icon-btn wide" title="Mi cuenta" style={{ textDecoration: 'none' }}>
-                                    <Icon name="user" />
-                                    <span className="a11y-label" style={{ display: 'inline-block', marginLeft: '0.3rem', fontWeight: '600' }}>
-                                        Hola, {usuario?.nombre}
+                                {/* El municipio no tiene "Mi cuenta" (su contraseña se cambia desde el panel),
+                                    asi que el saludo no es un link */}
+                                {esMunicipio ? (
+                                    <span className="icon-btn wide" style={{ cursor: 'default' }}>
+                                        <Icon name="user" />
+                                        <span className="a11y-label" style={{ display: 'inline-block', marginLeft: '0.3rem', fontWeight: '600' }}>
+                                            Hola, {usuario?.nombre}
+                                        </span>
                                     </span>
-                                </Link>
+                                ) : (
+                                    <Link to="/cuenta" className="icon-btn wide" title="Mi cuenta" style={{ textDecoration: 'none' }}>
+                                        <Icon name="user" />
+                                        <span className="a11y-label" style={{ display: 'inline-block', marginLeft: '0.3rem', fontWeight: '600' }}>
+                                            Hola, {usuario?.nombre}
+                                        </span>
+                                    </Link>
+                                )}
                                 <button type="button" className="icon-btn" title="Salir" onClick={handleLogout}>
                                     <Icon name="logout" />
                                 </button>

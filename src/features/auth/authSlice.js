@@ -149,4 +149,6 @@ const authSlice = createSlice({
 export const { logout } = authSlice.actions
 export const selectEstaLogueado = (state) => !!state.auth.usuario
 export const selectUsuario = (state) => state.auth.usuario
+// 'municipio' a mano (y no importado de rutasPorRol) para no mezclar el slice con la navegacion.
+export const selectEsMunicipio = (state) => state.auth.usuario?.rol === 'municipio'
 export default authSlice.reducer
