@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Icon from '../components/Icon';
-import { selectEstaLogueado } from '../features/auth/authSlice';
+import { selectEsMunicipio, selectEstaLogueado } from '../features/auth/authSlice';
 import AlertsList from '../components/AlertsList';
 import ConsejosSeguridad from '../components/ConsejosSeguridad';
 import { ZONAS, ALERTAS } from '../data/alertas';
@@ -24,6 +24,7 @@ const ACCIONES_RAPIDAS = [
 
 const Home = () => {
     const estaLogueado = useSelector(selectEstaLogueado);
+    const esMunicipio = useSelector(selectEsMunicipio);
 
     // Estados para los filtros
     const [filtroZona, setFiltroZona] = useState('todas');
@@ -77,8 +78,13 @@ const Home = () => {
             });
     }, []);
 
-    // Ver mis reportes solo tiene sentido con sesion iniciada
-    const accionesVisibles = ACCIONES_RAPIDAS.filter(a => a.ruta !== '/mis-reportes' || estaLogueado);
+    // Ver mis reportes solo tiene sentido con sesion iniciada. El municipio ve la
+    // pagina publica igual que un vecino, pero sin Reportar ni Mis reportes (no le
+    // corresponden: RutaProtegida lo sacaria de ahi igual).
+    const accionesVisibles = ACCIONES_RAPIDAS.filter(a => {
+        if (esMunicipio) return a.ruta !== '/reporte' && a.ruta !== '/mis-reportes';
+        return a.ruta !== '/mis-reportes' || estaLogueado;
+    });
 
     // Logica de filtrado
     const alertasFiltradas = ALERTAS.filter(a =>
