@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import Icon from '../components/Icon';
 import api from '../api/client';
 import LocationPicker from '../components/LocationPicker';
+import GaleriaFotos from '../components/GaleriaFotos';
 import { selectUsuario } from '../features/auth/authSlice';
 import { infoEstado } from '../features/reclamos/estados';
 
@@ -202,6 +203,12 @@ const MisReportes = () => {
                                                         />
                                                     </div>
                                                 )}
+                                            </div>
+                                        )}
+                                        {(r.fotos?.length > 0 || r.fotoUrl) && (
+                                            <div className="fila">
+                                                <span className="fila-label">Fotos</span>
+                                                <GaleriaFotos fotos={r.fotos} fotoUrl={r.fotoUrl} titulo={r.titulo} />
                                             </div>
                                         )}
                                         <div className="fila">

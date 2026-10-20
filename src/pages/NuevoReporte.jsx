@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from '../components/Icon';
 import LocationPicker from '../components/LocationPicker';
+import SelectorFotos from '../components/SelectorFotos';
 import api from '../api/client';
+import { mensajeDeError } from '../api/errores';
 import { crearReclamo } from '../features/reclamos/reclamosSlice';
+import { subirFotosReclamo } from '../features/reclamos/fotos';
 
 const NuevoReporte = () => {
     const navigate = useNavigate();
@@ -24,6 +27,14 @@ const NuevoReporte = () => {
     const [categoriaOtro, setCategoriaOtro] = useState('');
     const [desc, setDesc] = useState('');
     const [coordenadas, setCoordenadas] = useState(null);
+
+    // Las fotos se suben en un segundo paso, con el reclamo ya creado. Si ese
+    // paso falla, el reclamo queda guardado: se recuerda su id para reintentar
+    // solo la subida, sin crear un reclamo duplicado.
+    const [fotos, setFotos] = useState([]);
+    const [reclamoCreadoId, setReclamoCreadoId] = useState(null);
+    const [subiendoFotos, setSubiendoFotos] = useState(false);
+    const [errorFotos, setErrorFotos] = useState(null);
 
     useEffect(() => {
         let activo = true;
@@ -45,8 +56,28 @@ const NuevoReporte = () => {
     const categoriaSeleccionada = categorias.find((c) => String(c.id) === categoriaId);
     const esOtro = categoriaSeleccionada?.nombre?.toLowerCase() === 'otro';
 
+    const subirFotos = async (reclamoId) => {
+        setSubiendoFotos(true);
+        setErrorFotos(null);
+        try {
+            await subirFotosReclamo(reclamoId, fotos);
+            alert('¡Reporte enviado correctamente!');
+            navigate('/mis-reportes');
+        } catch (error) {
+            setErrorFotos(mensajeDeError(error, 'No se pudieron subir las fotos'));
+        } finally {
+            setSubiendoFotos(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Reintento: el reclamo ya existe, solo faltan las fotos.
+        if (reclamoCreadoId) {
+            await subirFotos(reclamoCreadoId);
+            return;
+        }
 
         if (!zonaId) {
             alert('Por favor, seleccioná una zona.'); return;
@@ -81,7 +112,7 @@ const NuevoReporte = () => {
         }
 
         try {
-            await dispatch(crearReclamo({
+            const reclamo = await dispatch(crearReclamo({
                 titulo: tituloFinal,
                 descripcion: desc,
                 // No hay columnas de lat/lng en Reclamo, asi que las coordenadas
@@ -90,6 +121,11 @@ const NuevoReporte = () => {
                 zonaId: Number(zonaId),
                 categoriaId: Number(categoriaId),
             })).unwrap();
+            if (fotos.length > 0) {
+                setReclamoCreadoId(reclamo.id);
+                await subirFotos(reclamo.id);
+                return;
+            }
             alert('¡Reporte enviado correctamente!');
             navigate('/mis-reportes');
         } catch {
@@ -119,7 +155,22 @@ const NuevoReporte = () => {
         <div className="page-wrap">
             <h1 className="page-title">Reportar un problema</h1>
 
-            {crearError && (
+            {reclamoCreadoId && errorFotos && (
+                <div className="aviso error" role="alert">
+                    <p style={{ margin: 0 }}><strong>Tu reporte se guardó, pero las fotos no se subieron.</strong></p>
+                    <p style={{ margin: '.25rem 0 0' }}>{errorFotos}</p>
+                    <button
+                        type="button"
+                        className="btn btn-outline"
+                        style={{ marginTop: '.6rem' }}
+                        onClick={() => navigate('/mis-reportes')}
+                    >
+                        Continuar sin fotos
+                    </button>
+                </div>
+            )}
+
+            {crearError && !reclamoCreadoId && (
                 <p style={{ color: '#c0392b', fontSize: '.9rem', marginBottom: '1rem' }}>
                     No se pudo enviar el reporte. Intentá de nuevo.
                 </p>
@@ -204,19 +255,17 @@ const NuevoReporte = () => {
                     ></textarea>
                 </div>
 
-                {/* FOTO */}
-                <div className="field">
-                    <label>Foto (opcional)</label>
-                    <button type="button" className="photo-drop" onClick={() => alert('Próximamente...')}>
-                        <span style={{ display: 'inline-flex', margin: '0 auto .4rem' }}>
-                            <Icon name="camera" size={28} />
-                        </span>
-                        <div>Tocá para agregar una foto</div>
-                    </button>
-                </div>
+                {/* FOTOS */}
+                <SelectorFotos
+                    fotos={fotos}
+                    setFotos={setFotos}
+                    deshabilitado={subiendoFotos || crearStatus === 'loading' || !!reclamoCreadoId}
+                />
 
-                <button type="submit" className="btn btn-primary btn-lg btn-block" style={{ marginTop: '1rem' }} disabled={crearStatus === 'loading'}>
-                    {crearStatus === 'loading' ? 'Enviando...' : 'Enviar reporte'}
+                <button type="submit" className="btn btn-primary btn-lg btn-block" style={{ marginTop: '1rem' }} disabled={crearStatus === 'loading' || subiendoFotos}>
+                    {crearStatus === 'loading' && 'Enviando...'}
+                    {crearStatus !== 'loading' && subiendoFotos && 'Subiendo fotos...'}
+                    {crearStatus !== 'loading' && !subiendoFotos && (reclamoCreadoId ? 'Reintentar subir fotos' : 'Enviar reporte')}
                 </button>
             </form>
         </div>

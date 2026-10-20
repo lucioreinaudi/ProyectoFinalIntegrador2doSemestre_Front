@@ -5,6 +5,7 @@ import { infoEstado, opcionesDeCambio } from '../../features/reclamos/estados';
 import { formatearFechaHora } from '../../features/reclamos/formato';
 import Icon from '../Icon';
 import LocationPicker from '../LocationPicker';
+import GaleriaFotos from '../GaleriaFotos';
 import PublicarReclamo from './PublicarReclamo';
 
 // Detalle de un reclamo en el panel (GET /api/admin/reclamos/{id}), en un modal,
@@ -134,10 +135,10 @@ const DetalleReclamo = ({ id, zonas, categorias, onCerrar, onCambio }) => {
                             </div>
 
                             <div className="detalle-bloque">
-                                <h4>Foto</h4>
-                                {r.fotoUrl
-                                    ? <img src={r.fotoUrl} alt={`Foto del reclamo ${r.titulo}`} className="detalle-foto" />
-                                    : <p className="detalle-vacio">Sin foto</p>}
+                                <h4>Fotos</h4>
+                                {r.fotos?.length > 0 || r.fotoUrl
+                                    ? <GaleriaFotos fotos={r.fotos} fotoUrl={r.fotoUrl} titulo={r.titulo} />
+                                    : <p className="detalle-vacio">Sin fotos</p>}
                             </div>
 
                             {/* Datos de contacto: solo los ve el municipio, nunca son publicos (Q10) */}
