@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from './Icon';
 import { NIVEL_LABEL } from '../features/alertas/alertas';
@@ -39,8 +39,17 @@ export const FotoAlerta = ({ alerta: a }) => {
 // "Mostrar mas" suma esa misma cantidad cada vez, para que la pagina no se haga
 // larguisima si hay muchas alertas activas. Quien la usa le pasa un key que
 // cambia con los filtros, asi al filtrar vuelve a la cantidad inicial.
+// "Mostrar menos" vuelve a la cantidad inicial de una.
 const AlertsList = ({ alertas, cargando = false, error = false, cantidadInicial }) => {
     const [visibles, setVisibles] = useState(cantidadInicial ?? Infinity);
+    const listaRef = useRef(null);
+
+    const mostrarMenos = () => {
+        setVisibles(cantidadInicial);
+        // Si estaba mas abajo, la pagina se achica de golpe y quedaria en otra
+        // seccion: se vuelve al principio de la lista de alertas.
+        listaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
 
     if (cargando) {
         return <p style={{ color: 'var(--texto-3)' }}>Cargando alertas...</p>;
@@ -65,7 +74,7 @@ const AlertsList = ({ alertas, cargando = false, error = false, cantidadInicial 
     }
 
     return (
-        <div className="alertas-list" style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+        <div ref={listaRef} className="alertas-list" style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
             {alertas.slice(0, visibles).map((a) => (
                 <div className={`alert-feature nivel-${a.nivel}`} key={a.id}>
                     <div>
@@ -93,14 +102,23 @@ const AlertsList = ({ alertas, cargando = false, error = false, cantidadInicial 
                 </div>
             ))}
 
-            {alertas.length > visibles && (
-                <button
-                    type="button"
-                    className="btn btn-outline mostrar-mas"
-                    onClick={() => setVisibles((v) => v + cantidadInicial)}
-                >
-                    Mostrar más (quedan {alertas.length - visibles})
-                </button>
+            {(alertas.length > visibles || visibles > cantidadInicial) && (
+                <div className="mostrar-mas">
+                    {alertas.length > visibles && (
+                        <button
+                            type="button"
+                            className="btn btn-outline"
+                            onClick={() => setVisibles((v) => v + cantidadInicial)}
+                        >
+                            Mostrar más (quedan {alertas.length - visibles})
+                        </button>
+                    )}
+                    {visibles > cantidadInicial && (
+                        <button type="button" className="btn btn-outline" onClick={mostrarMenos}>
+                            Mostrar menos
+                        </button>
+                    )}
+                </div>
             )}
         </div>
     );

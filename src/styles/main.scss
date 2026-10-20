@@ -2222,5 +2222,8 @@ html[data-subrayar-enlaces] {
 
 /* ---------------- MOSTRAR MAS ALERTAS (SCRUM-89) ---------------- */
 .mostrar-mas {
-    align-self: center;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: .6rem;
 }
