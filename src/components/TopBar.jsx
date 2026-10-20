@@ -30,10 +30,9 @@ const TopBar = () => {
         return () => clearTimeout(timer);
     }, [mostrarEasterEgg]);
 
-    const handleLogoClick = (e) => {
-        // Evita el comportamiento predeterminado del link mientras clickeas
-        e.preventDefault();
-
+    const handleLogoClick = () => {
+        // No se bloquea la navegacion (sin preventDefault): el logo sigue
+        // llevando al Home como siempre, y de paso cuenta los clics.
         // Reinicia el timeout si el usuario tarda más de 2.5s entre click y click
         if (timerResetRef.current) clearTimeout(timerResetRef.current);
 
@@ -64,12 +63,11 @@ const TopBar = () => {
 
                 {/* LOGO Y MARCA CON EASTER EGG */}
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <div 
-                        className="brand" 
-                        onClick={handleLogoClick} 
+                    <Link
+                        to="/"
+                        className="brand"
+                        onClick={handleLogoClick}
                         style={{ cursor: 'pointer', userSelect: 'none' }}
-                        role="button"
-                        tabIndex={0}
                     >
                         <div className="brand-mark">
                             <svg viewBox="0 0 48 48" width="100%" height="100%" aria-hidden="true">
@@ -85,7 +83,7 @@ const TopBar = () => {
                             <strong>Conectar Laboulaye</strong>
                             <span>Municipalidad de Laboulaye</span>
                         </div>
-                    </div>
+                    </Link>
 
                     {/* GATITO EASTER EGG (6.7 segundos) */}
                     {mostrarEasterEgg && (
