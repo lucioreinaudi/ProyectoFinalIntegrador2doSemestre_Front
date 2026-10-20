@@ -1203,7 +1203,25 @@ main:focus {
     color: var(--bajo-icono);
 }
 
+.af-photo.con-foto img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.af-photo.con-foto::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(to top, rgba(0, 0, 0, .55), transparent 45%);
+    pointer-events: none;
+}
+
 .af-photo .cap {
+    z-index: 2;
     position: absolute;
     left: .6rem;
     bottom: .6rem;
