@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import AlertsList from '../components/AlertsList';
-import { ZONAS, ALERTAS } from '../data/alertas';
+import useAlertasActivas from '../features/alertas/useAlertasActivas';
 
 const Alertas = () => {
     const [filtroZona, setFiltroZona] = useState('todas');
     const [filtroNivel, setFiltroNivel] = useState('todos');
 
-    const alertasFiltradas = ALERTAS.filter(a =>
+    // Alertas reales del back (publicas, se ven sin login).
+    const { alertas, zonas, cargando, error } = useAlertasActivas();
+
+    const alertasFiltradas = alertas.filter(a =>
         (filtroZona === 'todas' || a.zona === filtroZona) &&
         (filtroNivel === 'todos' || a.nivel === filtroNivel)
     );
@@ -25,7 +28,7 @@ const Alertas = () => {
                     onChange={(e) => setFiltroZona(e.target.value)}
                 >
                     <option value="todas">Todas las zonas</option>
-                    {ZONAS.map(z => <option key={z} value={z}>{z}</option>)}
+                    {zonas.map(z => <option key={z} value={z}>{z}</option>)}
                 </select>
                 <div className="seg-filtro" role="group" aria-label="Filtrar por nivel de gravedad">
                     <button aria-pressed={filtroNivel === 'todos'} onClick={() => setFiltroNivel('todos')}>Todos</button>
@@ -35,7 +38,7 @@ const Alertas = () => {
                 </div>
             </div>
 
-            <AlertsList alertas={alertasFiltradas} />
+            <AlertsList alertas={alertasFiltradas} cargando={cargando} error={error} />
         </div>
     );
 };

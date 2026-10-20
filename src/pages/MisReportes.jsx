@@ -1,17 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Icon from '../components/Icon';
 import api from '../api/client';
 import LocationPicker from '../components/LocationPicker';
 import { selectUsuario } from '../features/auth/authSlice';
-
-// Mismos valores que el CHECK de EstadoReclamo en la BD.
-const ESTADO_INFO = {
-    recibido: { label: 'Recibido', clase: 'recibido' },
-    'en revision': { label: 'En revisión', clase: 'revision' },
-    'en proceso': { label: 'En proceso', clase: 'proceso' },
-    resuelto: { label: 'Resuelto', clase: 'resuelto' },
-};
+import { infoEstado } from '../features/reclamos/estados';
 
 function formatearHace(fechaIso) {
     const fecha = new Date(fechaIso);
@@ -46,63 +40,58 @@ const MisReportes = () => {
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(false);
 
-    // Id del reclamo abierto (solo uno a la vez), y el historial de cada uno
-    // que ya se pidio, guardado para no volver a pedirlo si se cierra y se
-    // vuelve a abrir el mismo.
-    const [abiertoId, setAbiertoId] = useState(null);
+    // ?reclamo=<id> abre ese reclamo (lo usa la campanita de notificaciones).
+    const [searchParams] = useSearchParams();
+    const reclamoDeLaUrl = Number(searchParams.get('reclamo')) || null;
+
+    // Id del reclamo abierto (solo uno a la vez). Si cambia el ?reclamo= de la URL
+    // (otra notificacion estando ya en esta pagina), se abre ese: se ajusta el
+    // estado durante el render, que es la forma que recomienda React para esto.
+    const [abiertoId, setAbiertoId] = useState(reclamoDeLaUrl);
+    const [reclamoUrlPrevio, setReclamoUrlPrevio] = useState(reclamoDeLaUrl);
+    if (reclamoDeLaUrl !== reclamoUrlPrevio) {
+        setReclamoUrlPrevio(reclamoDeLaUrl);
+        setAbiertoId(reclamoDeLaUrl);
+    }
+
+    // Historial de cada reclamo que ya se pidio, para no volver a pedirlo.
+    // Esta "cargando" mientras el abierto todavia no tiene su historial guardado.
     const [historiales, setHistoriales] = useState({});
-    const [cargandoHistorial, setCargandoHistorial] = useState(null);
+    const cargandoHistorial = abiertoId !== null && !(abiertoId in historiales);
 
     useEffect(() => {
         if (!usuario) return;
         let activo = true;
 
+        // Ya viene con el estado actual y "publicado" (SCRUM-80): un solo pedido,
+        // en vez de uno extra por cada reclamo como antes.
         api.get('/api/reclamos/me')
-            .then(async (res) => {
-                // ReclamoResponse no trae el estado actual (vive en otra tabla),
-                // asi que hay que pedirlo aparte por cada reclamo.
-                const conEstado = await Promise.all(
-                    res.data.map(async (r) => {
-                        try {
-                            const resEstado = await api.get(`/api/estados-reclamo/reclamo/${r.id}/actual`);
-                            return { ...r, estado: resEstado.data.estado };
-                        } catch {
-                            return { ...r, estado: 'recibido' };
-                        }
-                    })
-                );
-                if (activo) setReportes(conEstado);
-            })
-            .catch(() => {
-                if (activo) setError(true);
-            })
-            .finally(() => {
-                if (activo) setCargando(false);
-            });
+            .then((res) => { if (activo) setReportes(res.data); })
+            .catch(() => { if (activo) setError(true); })
+            .finally(() => { if (activo) setCargando(false); });
 
         return () => { activo = false; };
     }, [usuario]);
 
-    const toggleAbierto = async (id) => {
-        if (abiertoId === id) {
-            setAbiertoId(null);
-            return;
+    // El historial completo se pide recien al abrir un reclamo, no el de todos de entrada.
+    useEffect(() => {
+        if (abiertoId === null || abiertoId in historiales) return;
+        let activo = true;
+        api.get(`/api/estados-reclamo/reclamo/${abiertoId}`)
+            .then((res) => { if (activo) setHistoriales((prev) => ({ ...prev, [abiertoId]: res.data })); })
+            .catch(() => { if (activo) setHistoriales((prev) => ({ ...prev, [abiertoId]: [] })); });
+        return () => { activo = false; };
+    }, [abiertoId, historiales]);
+
+    // Si se llego desde una notificacion, llevar la vista hasta ese reclamo.
+    useEffect(() => {
+        if (!cargando && reclamoDeLaUrl) {
+            document.getElementById(`reclamo-${reclamoDeLaUrl}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-        setAbiertoId(id);
-        // El historial completo se pide recien al abrir, no para los 8 (o los que sean)
-        // reclamos de entrada: ya hacemos un pedido por reclamo solo para el estado actual,
-        // no tiene sentido pedir ademas el historial de todos de una.
-        if (!historiales[id]) {
-            setCargandoHistorial(id);
-            try {
-                const res = await api.get(`/api/estados-reclamo/reclamo/${id}`);
-                setHistoriales((prev) => ({ ...prev, [id]: res.data }));
-            } catch {
-                setHistoriales((prev) => ({ ...prev, [id]: [] }));
-            } finally {
-                setCargandoHistorial(null);
-            }
-        }
+    }, [cargando, reclamoDeLaUrl]);
+
+    const toggleAbierto = (id) => {
+        setAbiertoId(abiertoId === id ? null : id);
     };
 
     if (!usuario) {
@@ -146,22 +135,30 @@ const MisReportes = () => {
             ) : (
                 <div id="lista-reclamos">
                     {reportes.map((r) => {
-                        const info = ESTADO_INFO[r.estado] || { label: r.estado, clase: 'recibido' };
+                        const info = infoEstado(r.estadoActual);
                         const abierto = abiertoId === r.id;
+                        const historial = historiales[r.id] || [];
+                        // El motivo del rechazo es el comentario del ultimo estado (rechazado).
+                        const motivoRechazo = r.estadoActual === 'rechazado' && historial.length > 0
+                            ? historial[historial.length - 1].comentario
+                            : null;
                         return (
-                            <div key={r.id} className="reclamo-item">
+                            <div key={r.id} id={`reclamo-${r.id}`} className="reclamo-item">
                                 <div
                                     className="reclamo-item-header"
                                     onClick={() => toggleAbierto(r.id)}
                                     role="button"
                                     tabIndex={0}
+                                    aria-expanded={abierto}
                                     onKeyDown={(e) => { if (e.key === 'Enter') toggleAbierto(r.id); }}
                                 >
                                     <div>
                                         <div className="top" style={{ marginBottom: 0 }}>
                                             <strong>{r.titulo}</strong>
-                                            <span className={`estado-pill ${info.clase}`}>
-                                                {info.label}
+                                            <span className="reclamo-chips">
+                                                {/* Q30: el vecino ve que su reclamo se hizo publico */}
+                                                {r.publicado && <span className="chip publicado">Publicado</span>}
+                                                <span className={`estado-pill ${info.clase}`}>{info.label}</span>
                                             </span>
                                         </div>
                                         <div className="meta">
@@ -173,6 +170,18 @@ const MisReportes = () => {
 
                                 {abierto && (
                                     <div className="reclamo-item-detalle">
+
+                                        {motivoRechazo && (
+                                            <div className="aviso error" style={{ marginBottom: 0 }}>
+                                                <strong>Motivo del rechazo:</strong> {motivoRechazo}
+                                            </div>
+                                        )}
+
+                                        {r.publicado && (
+                                            <div className="aviso ok" style={{ marginBottom: 0 }}>
+                                                Tu reclamo fue publicado como alerta para informar a los vecinos de la zona.
+                                            </div>
+                                        )}
 
                                         {r.descripcion && (
                                             <div className="fila">
@@ -202,17 +211,21 @@ const MisReportes = () => {
 
                                         <div className="fila">
                                             <span className="fila-label">Historial de estados</span>
-                                            {cargandoHistorial === r.id ? (
+                                            {cargandoHistorial ? (
                                                 <span>Cargando historial...</span>
                                             ) : (
                                                 <div className="historial">
-                                                    {(historiales[r.id] || []).map((h) => {
-                                                        const infoH = ESTADO_INFO[h.estado] || { label: h.estado, clase: 'recibido' };
+                                                    {historial.map((h) => {
+                                                        const infoH = infoEstado(h.estado);
                                                         return (
                                                             <div key={h.id} className="historial-item">
-                                                                <span className={`estado-pill ${infoH.clase}`}>
-                                                                    {infoH.label}
-                                                                </span>
+                                                                <div>
+                                                                    <span className={`estado-pill ${infoH.clase}`}>
+                                                                        {infoH.label}
+                                                                    </span>
+                                                                    {/* Lo que el municipio le dejo al vecino en cada cambio */}
+                                                                    {h.comentario && <p className="historial-comentario">{h.comentario}</p>}
+                                                                </div>
                                                                 <span className="fecha">{formatearFechaCompleta(h.fecha)}</span>
                                                             </div>
                                                         );

@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from './Icon';
 import PanelAccesibilidad from './PanelAccesibilidad';
+import Notificaciones from './Notificaciones';
 import { logout, selectEsMunicipio, selectEstaLogueado, selectUsuario } from '../features/auth/authSlice';
 import { alternarTema, selectTema } from '../features/preferencias/preferenciasSlice';
 
@@ -139,13 +140,9 @@ const TopBar = () => {
                         <Icon name={esOscuro ? 'sun' : 'moon'} />
                     </button>
                     <PanelAccesibilidad />
-                    {/* Las notificaciones son del vecino (cambios en sus reclamos); el municipio no recibe */}
-                    {!esMunicipio && (
-                        <button className="icon-btn" title="Notificaciones">
-                            <Icon name="bell" />
-                            <span className="badge-dot">3</span>
-                        </button>
-                    )}
+                    {/* Las notificaciones son del vecino logueado (cambios en sus reclamos):
+                        ni el municipio ni alguien sin sesion tienen */}
+                    {estaLogueado && !esMunicipio && <Notificaciones />}
 
                     {/* LÓGICA DE INGRESO / USUARIO LOGUEADO */}
                     <div style={{ display: 'flex', alignItems: 'center', marginLeft: '0.5rem', paddingLeft: '0.5rem', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>

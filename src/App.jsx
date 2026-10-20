@@ -4,6 +4,7 @@ import TopBar from './components/TopBar';
 import BottomNav from './components/BottomNav';
 import Home from './pages/Home';
 import Alertas from './pages/Alertas';
+import DetalleAlerta from './pages/DetalleAlerta';
 import NuevoReporte from './pages/NuevoReporte';
 import MisReportes from './pages/MisReportes';
 import MiCuenta from './pages/MiCuenta';
@@ -29,6 +30,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/alertas" element={<Alertas />} />
+                    <Route path="/alertas/:id" element={<DetalleAlerta />} />
                     {/* Solo vecinos: el municipio no reporta, no tiene "mis reportes" ni edita su perfil */}
                     <Route path="/reporte" element={<RutaProtegida rol={ROL_VECINO}><NuevoReporte /></RutaProtegida>} />
                     <Route path="/mis-reportes" element={<RutaProtegida rol={ROL_VECINO}><MisReportes /></RutaProtegida>} />

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Icon from './Icon';
+import { NIVEL_LABEL } from '../features/alertas/alertas';
 
 // Foto de referencia por tipo de alerta (cambiar una = reemplazar el archivo en public/img/alertas/)
 const FOTO_REFERENCIA = {
@@ -9,9 +11,9 @@ const FOTO_REFERENCIA = {
     tree: '/img/alertas/arbol.jpg',
 };
 
-const NIVEL_LABEL = { alto: 'Nivel alto', medio: 'Precaución', bajo: 'Informativo' };
 
-const FotoAlerta = ({ alerta: a }) => {
+// Exportada para reutilizarla en el detalle de la alerta.
+export const FotoAlerta = ({ alerta: a }) => {
     const [falla, setFalla] = useState(false);
     // Foto real subida por el municipio; si no hay, la de referencia por tipo.
     const src = a.imagenUrl || FOTO_REFERENCIA[a.foto];
@@ -33,7 +35,19 @@ const FotoAlerta = ({ alerta: a }) => {
     );
 };
 
-const AlertsList = ({ alertas }) => {
+const AlertsList = ({ alertas, cargando = false, error = false }) => {
+    if (cargando) {
+        return <p style={{ color: 'var(--texto-3)' }}>Cargando alertas...</p>;
+    }
+    if (error) {
+        return (
+            <div className="empty-state">
+                <Icon name="alert-triangle" size={40} />
+                <p>No se pudieron cargar las alertas. Intentá de nuevo más tarde.</p>
+            </div>
+        );
+    }
+
     // Si no hay alertas para el filtro, mostramos que está todo bien
     if (!alertas || alertas.length === 0) {
         return (
@@ -65,12 +79,9 @@ const AlertsList = ({ alertas }) => {
                         </div>
                         <p className="af-desc">{a.desc}</p>
 
-                        <button
-                            className="btn btn-primary"
-                            onClick={() => alert('Próximamente: Detalle de la alerta')}
-                        >
+                        <Link to={`/alertas/${a.id}`} className="btn btn-primary">
                             Ver alerta completa <Icon name="arrow-right" size={16} />
-                        </button>
+                        </Link>
                     </div>
                     <FotoAlerta alerta={a} />
                 </div>

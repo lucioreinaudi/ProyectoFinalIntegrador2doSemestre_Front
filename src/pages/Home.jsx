@@ -5,7 +5,7 @@ import Icon from '../components/Icon';
 import { selectEsMunicipio, selectEstaLogueado } from '../features/auth/authSlice';
 import AlertsList from '../components/AlertsList';
 import ConsejosSeguridad from '../components/ConsejosSeguridad';
-import { ZONAS, ALERTAS } from '../data/alertas';
+import useAlertasActivas from '../features/alertas/useAlertasActivas';
 
 // Datos estáticos
 const CONTACTOS = [
@@ -29,6 +29,9 @@ const Home = () => {
     // Estados para los filtros
     const [filtroZona, setFiltroZona] = useState('todas');
     const [filtroNivel, setFiltroNivel] = useState('todos');
+
+    // Alertas reales del back (publicas, se ven sin login).
+    const { alertas, zonas, cargando: cargandoAlertas, error: errorAlertas } = useAlertasActivas();
 
     // Estado para la información del clima
     const [clima, setClima] = useState({
@@ -87,7 +90,7 @@ const Home = () => {
     });
 
     // Logica de filtrado
-    const alertasFiltradas = ALERTAS.filter(a =>
+    const alertasFiltradas = alertas.filter(a =>
         (filtroZona === 'todas' || a.zona === filtroZona) &&
         (filtroNivel === 'todos' || a.nivel === filtroNivel)
     );
@@ -152,7 +155,7 @@ const Home = () => {
                             onChange={(e) => setFiltroZona(e.target.value)}
                         >
                             <option value="todas">Todas las zonas</option>
-                            {ZONAS.map(z => <option key={z} value={z}>{z}</option>)}
+                            {zonas.map(z => <option key={z} value={z}>{z}</option>)}
                         </select>
                         <div className="seg-filtro" role="group" aria-label="Filtrar por nivel de gravedad">
                             <button aria-pressed={filtroNivel === 'todos'} onClick={() => setFiltroNivel('todos')}>Todos</button>
@@ -163,7 +166,7 @@ const Home = () => {
                     </div>
 
                     {/* Renderizamos el componente pasándole las alertas ya filtradas */}
-                    <AlertsList alertas={alertasFiltradas} />
+                    <AlertsList alertas={alertasFiltradas} cargando={cargandoAlertas} error={errorAlertas} />
                 </div>
 
                 {/* ACCIONES RÁPIDAS */}

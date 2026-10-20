@@ -2085,3 +2085,137 @@ html[data-subrayar-enlaces] {
     border-radius: var(--radius-s);
     background: var(--superficie-2);
 }
+
+/* ---------------- LADO VECINO (SCRUM-84) ---------------- */
+// Campanita de notificaciones
+.notif {
+    position: relative;
+}
+
+.notif-panel {
+    position: absolute;
+    top: calc(100% + .4rem);
+    right: 0;
+    width: min(340px, 90vw);
+    max-height: 420px;
+    overflow-y: auto;
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radius-m);
+    box-shadow: var(--sombra);
+    z-index: 1000;
+}
+
+.notif-head {
+    padding: .7rem 1rem;
+    font-weight: 800;
+    font-size: .9rem;
+    color: var(--texto-1);
+    border-bottom: 1px solid var(--borde);
+}
+
+.notif-vacio {
+    margin: 0;
+    padding: 1rem;
+    font-size: .88rem;
+    color: var(--texto-3);
+}
+
+.notif-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.notif-item {
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--borde);
+    padding: .7rem 1rem;
+    cursor: pointer;
+    color: var(--texto-2);
+
+    &:hover {
+        background: var(--superficie-2);
+    }
+
+    &.no-leida {
+        background: var(--info-bg);
+        color: var(--texto-1);
+        font-weight: 700;
+    }
+}
+
+.notif-mensaje {
+    font-size: .86rem;
+    line-height: 1.35;
+}
+
+.notif-fecha {
+    font-size: .74rem;
+    color: var(--texto-3);
+    font-weight: 400;
+}
+
+// Mis Reportes
+.reclamo-chips {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    flex-wrap: wrap;
+}
+
+.historial-comentario {
+    margin: .3rem 0 0;
+    font-size: .82rem;
+    color: var(--texto-2);
+    white-space: pre-line;
+}
+
+// Detalle publico de una alerta
+.volver {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    margin-bottom: 1rem;
+    text-decoration: none;
+}
+
+.alerta-detalle-titulo {
+    font-size: 1.4rem;
+    margin: .4rem 0;
+    color: var(--texto-1);
+}
+
+.alerta-recomendaciones {
+    margin-top: 1rem;
+
+    h2 {
+        font-size: .8rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: var(--texto-3);
+        margin: 0 0 .3rem;
+    }
+
+    p {
+        margin: 0;
+        color: var(--texto-1);
+        white-space: pre-line;
+    }
+}
+
+.alerta-reportes {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    margin-top: 1rem;
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--texto-2);
+}
