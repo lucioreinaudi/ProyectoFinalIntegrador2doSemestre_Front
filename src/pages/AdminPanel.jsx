@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
 import Icon from '../components/Icon';
+import PanelAlertas from '../components/admin/PanelAlertas';
 import PanelReclamos from '../components/admin/PanelReclamos';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('reclamos');
 
   // --- DATOS SIMULADOS ---
-  const [alertas, setAlertas] = useState([
-    { id: 1, titulo: 'Corte por bacheo', nivelGravedad: 'medio', zona: 'Centro', fechaEmision: '14/10/2026', estado: 'activa' },
-    { id: 2, titulo: 'Alerta de Tormenta', nivelGravedad: 'alto', zona: 'Todas', fechaEmision: '12/10/2026', estado: 'finalizada' }
-  ]);
-
   const [usuarios] = useState([
     { id: 1, nombre: 'Ana Gómez', documento: '34567890', email: 'ana@email.com', telefono: '3385550123', zona: 'Centro', rol: 'vecino', fechaRegistro: '01/08/2026', cantReclamos: 4 },
     { id: 2, nombre: 'Carlos Ruiz', documento: '29888777', email: 'cruiz@email.com', telefono: '3385112233', zona: 'Norte', rol: 'municipio', fechaRegistro: '15/07/2026', cantReclamos: 0 }
@@ -29,8 +25,6 @@ const AdminPanel = () => {
   // --- ESTADOS PARA MODALES Y FILTROS ---
   const [filtroUsuario, setFiltroUsuario] = useState('');
   
-  const [showAlertaModal, setShowAlertaModal] = useState(false);
-  const [nuevaAlerta, setNuevaAlerta] = useState({ titulo: '', descripcion: '', zona: '', nivelGravedad: 'medio', recomendaciones: '', estado: 'activa' });
 
   const usuariosFiltrados = usuarios.filter(u => 
     `${u.nombre}`.toLowerCase().includes(filtroUsuario.toLowerCase()) || 
@@ -75,7 +69,7 @@ const AdminPanel = () => {
       </div>
 
       {/* ==================== RECLAMOS ==================== */}
-      {/* Conectada al back (SCRUM-81). El resto de las pestanas sigue siendo maqueta. */}
+      {/* Conectada al back (SCRUM-81). Usuarios, Configuracion y Metricas siguen siendo maqueta. */}
       {activeTab === 'reclamos' && (
         <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
           <PanelReclamos />
@@ -83,38 +77,10 @@ const AdminPanel = () => {
       )}
 
       {/* ==================== ALERTAS ==================== */}
+      {/* Conectada al back (SCRUM-83) */}
       {activeTab === 'alertas' && (
         <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '1.2rem', margin: 0 }}>Alertas Emitidas</h2>
-            <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }} onClick={() => setShowAlertaModal(true)}>
-              <Icon name="plus" size={16} /> Alerta Propia
-            </button>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-            {alertas.map(alerta => (
-              <div key={alerta.id} className="card-box" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', opacity: alerta.estado === 'finalizada' ? 0.6 : 1 }}>
-                <div>
-                  <strong style={{ display: 'block', color: 'var(--texto-1)' }}>{alerta.titulo}</strong>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--texto-3)' }}>Emisión: {alerta.fechaEmision} | Zona: {alerta.zona}</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <span style={{ 
-                    padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'capitalize',
-                    background: alerta.nivelGravedad === 'alto' ? '#fef2f2' : alerta.nivelGravedad === 'medio' ? '#fff7ed' : '#eff6ff',
-                    color: alerta.nivelGravedad === 'alto' ? '#ef4444' : alerta.nivelGravedad === 'medio' ? '#f97316' : '#3b82f6'
-                  }}>
-                    Nivel {alerta.nivelGravedad}
-                  </span>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: alerta.estado === 'activa' ? '#10b981' : 'var(--texto-3)' }}>
-                    {alerta.estado.toUpperCase()}
-                  </span>
-                  <button className="link-btn" title="Editar"><Icon name="edit" size={18} /></button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <PanelAlertas />
         </div>
       )}
 
@@ -239,68 +205,6 @@ const AdminPanel = () => {
               <span style={{ display: 'block', fontSize: '2rem', fontWeight: '900', color: 'var(--texto-1)' }}>4.2 días</span>
               <span style={{ color: 'var(--texto-2)', fontSize: '0.9rem' }}>Tpo. Promedio Resolución</span>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* ==================== MODAL NUEVA ALERTA (Adaptado a DB) ==================== */}
-      {showAlertaModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div className="card-box" style={{ width: '100%', maxWidth: '600px', padding: '1.5rem', animation: 'fadeIn 0.2s ease-out', maxHeight: '90vh', overflowY: 'auto' }}>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--borde)', paddingBottom: '0.5rem' }}>
-              <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Crear Alerta Propia</h3>
-              <button type="button" className="icon-btn" onClick={() => setShowAlertaModal(false)} style={{ padding: '0.2rem' }} title="Cerrar">
-                <Icon name="x" size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={(e) => { e.preventDefault(); setShowAlertaModal(false); }}>
-              <div className="field">
-                <label>Título de la alerta</label>
-                <input type="text" required placeholder="Ej: Calle cortada por obras" value={nuevaAlerta.titulo} onChange={(e) => setNuevaAlerta({...nuevaAlerta, titulo: e.target.value})} />
-              </div>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div className="field">
-                  <label>Nivel de gravedad</label>
-                  <select value={nuevaAlerta.nivelGravedad} onChange={(e) => setNuevaAlerta({...nuevaAlerta, nivelGravedad: e.target.value})}>
-                    <option value="bajo">Bajo</option>
-                    <option value="medio">Medio</option>
-                    <option value="alto">Alto</option>
-                  </select>
-                </div>
-                <div className="field">
-                  <label>Zona afectada</label>
-                  <select required value={nuevaAlerta.zona} onChange={(e) => setNuevaAlerta({...nuevaAlerta, zona: e.target.value})}>
-                    <option value="">Seleccione zona...</option>
-                    <option value="Centro">Centro</option>
-                    <option value="Norte">Norte</option>
-                    <option value="Todas">Todas las zonas</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="field">
-                <label>Descripción del problema</label>
-                <textarea rows="3" required placeholder="Detalle la situación general..." value={nuevaAlerta.descripcion} onChange={(e) => setNuevaAlerta({...nuevaAlerta, descripcion: e.target.value})}></textarea>
-              </div>
-
-              <div className="field">
-                <label>Recomendaciones (Opcional)</label>
-                <textarea rows="2" placeholder="Ej: Evitar circular por la zona..." value={nuevaAlerta.recomendaciones} onChange={(e) => setNuevaAlerta({...nuevaAlerta, recomendaciones: e.target.value})}></textarea>
-              </div>
-
-              <div className="field">
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Icon name="image" size={14} /> Foto / Imagen adjunta (Opcional)</label>
-                <input type="file" accept="image/*" />
-              </div>
-
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-                <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={() => setShowAlertaModal(false)}>Cancelar</button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Emitir Alerta</button>
-              </div>
-            </form>
           </div>
         </div>
       )}

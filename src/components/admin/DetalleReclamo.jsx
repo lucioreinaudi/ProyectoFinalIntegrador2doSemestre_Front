@@ -5,16 +5,18 @@ import { infoEstado, opcionesDeCambio } from '../../features/reclamos/estados';
 import { formatearFechaHora } from '../../features/reclamos/formato';
 import Icon from '../Icon';
 import LocationPicker from '../LocationPicker';
+import PublicarReclamo from './PublicarReclamo';
 
 // Detalle de un reclamo en el panel (GET /api/admin/reclamos/{id}), en un modal,
-// con las acciones del municipio: cambiar estado y reclasificar zona/categoria.
-// Publicar el reclamo como alerta va con la pestana Alertas (card siguiente).
+// con las acciones del municipio: cambiar estado, reclasificar zona/categoria y
+// publicar el reclamo como alerta (SCRUM-83).
 const DetalleReclamo = ({ id, zonas, categorias, onCerrar, onCambio }) => {
     const [version, setVersion] = useState(0);
     const [resultado, setResultado] = useState({ clave: null, datos: null, error: null });
     const [aviso, setAviso] = useState(null); // { tipo: 'ok' | 'error', texto }
     const [alertasParaFinalizar, setAlertasParaFinalizar] = useState([]);
     const [finalizando, setFinalizando] = useState(false);
+    const [publicando, setPublicando] = useState(false);
 
     const clave = `${id}-${version}`;
     const cargando = resultado.clave !== clave;
@@ -170,6 +172,24 @@ const DetalleReclamo = ({ id, zonas, categorias, onCerrar, onCambio }) => {
                                     categorias={categorias}
                                     onListo={() => recargar('Reclamo reclasificado.')}
                                 />
+                            </div>
+
+                            <div className="detalle-bloque">
+                                <h4>Publicar</h4>
+                                {r.estadoActual === 'rechazado' ? (
+                                    <p className="detalle-vacio">Un reclamo rechazado no se puede publicar.</p>
+                                ) : publicando ? (
+                                    <PublicarReclamo
+                                        reclamo={r}
+                                        zonas={zonas}
+                                        onCancelar={() => setPublicando(false)}
+                                        onPublicado={(texto) => { setPublicando(false); recargar(texto); }}
+                                    />
+                                ) : (
+                                    <button type="button" className="btn btn-outline btn-chico" onClick={() => setPublicando(true)}>
+                                        {r.publicado ? 'Publicar en otra alerta' : 'Publicar como alerta'}
+                                    </button>
+                                )}
                             </div>
 
                             <div className="detalle-bloque">

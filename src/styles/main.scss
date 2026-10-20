@@ -2001,3 +2001,87 @@ html[data-subrayar-enlaces] {
     color: var(--texto-2);
     white-space: pre-line;
 }
+
+/* ---------------- PANEL ADMIN: ALERTAS (SCRUM-83) ---------------- */
+.admin-campo {
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--texto-2);
+
+    &.check {
+        flex-direction: row;
+        align-items: center;
+        gap: .4rem;
+    }
+}
+
+.admin-form input[type="text"] {
+    width: 100%;
+    padding: .45rem .6rem;
+    background: var(--superficie);
+    color: var(--texto-1);
+    border: 1px solid var(--borde-fuerte);
+    border-radius: var(--radius-s);
+    font: inherit;
+    font-size: .88rem;
+
+    &:focus {
+        outline: none;
+        box-shadow: var(--focus);
+    }
+}
+
+.admin-form-fila {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: .6rem;
+
+    @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.admin-reclamo.finalizada {
+    opacity: .7;
+}
+
+.estado-alerta {
+    font-size: .75rem;
+    font-weight: 800;
+    padding: .25rem .65rem;
+    border-radius: 999px;
+
+    &.activa {
+        background: var(--bajo-bg);
+        color: var(--bajo-texto);
+    }
+
+    &.finalizada {
+        background: var(--superficie-2);
+        color: var(--texto-3);
+        border: 1px solid var(--borde);
+    }
+}
+
+.btn-peligro {
+    background: var(--alto-icono);
+    color: #fff;
+    border: 1px solid var(--alto-icono);
+}
+
+.texto-peligro {
+    color: var(--alto-icono);
+}
+
+.publicar-caja {
+    display: flex;
+    flex-direction: column;
+    gap: .8rem;
+    padding: .9rem;
+    border: 1px solid var(--borde);
+    border-radius: var(--radius-s);
+    background: var(--superficie-2);
+}
