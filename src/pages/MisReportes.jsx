@@ -57,7 +57,7 @@ const MisReportes = () => {
         if (!usuario) return;
         let activo = true;
 
-        api.get(`/api/reclamos/usuario/${usuario.id}`)
+        api.get('/api/reclamos/me')
             .then(async (res) => {
                 // ReclamoResponse no trae el estado actual (vive en otra tabla),
                 // asi que hay que pedirlo aparte por cada reclamo.
