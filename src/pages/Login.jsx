@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from '../components/Icon';
 import { login } from '../features/auth/authSlice';
+import { ROL_MUNICIPIO } from '../features/auth/rutasPorRol';
 
 const Login = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const dispatch = useDispatch();
     const { status, error } = useSelector((state) => state.auth);
     const [credenciales, setCredenciales] = useState({
@@ -20,8 +22,11 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            await dispatch(login(credenciales)).unwrap();
-            navigate('/');
+            const { usuario } = await dispatch(login(credenciales)).unwrap();
+            // El municipio siempre va a su panel. El vecino vuelve a la pagina que
+            // queria ver antes de que RutaProtegida lo mandara al login (o al Home).
+            const destino = usuario.rol === ROL_MUNICIPIO ? '/admin' : (location.state?.desde || '/');
+            navigate(destino, { replace: true });
         } catch {
             // El error ya queda guardado en el estado (authSlice) y se muestra abajo.
         }
