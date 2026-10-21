@@ -29,7 +29,7 @@ const PanelAlertas = () => {
 
     useEffect(() => {
         let activo = true;
-        api.get('/api/zonas')
+        api.get('/api/admin/zonas') // incluye dadas de baja (filtros y alertas viejas)
             .then((res) => { if (activo) setZonas(res.data); })
             .catch(() => { /* sin zonas, el formulario no deja guardar */ });
         return () => { activo = false; };

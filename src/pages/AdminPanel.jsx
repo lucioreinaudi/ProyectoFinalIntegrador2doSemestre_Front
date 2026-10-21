@@ -1,36 +1,15 @@
 import React, { useState } from 'react';
 import Icon from '../components/Icon';
+import CambiarPassword from '../components/admin/CambiarPassword';
 import PanelAlertas from '../components/admin/PanelAlertas';
+import PanelConfiguracion from '../components/admin/PanelConfiguracion';
 import PanelReclamos from '../components/admin/PanelReclamos';
+import PanelUsuarios from '../components/admin/PanelUsuarios';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('reclamos');
 
-  // --- DATOS SIMULADOS ---
-  const [usuarios] = useState([
-    { id: 1, nombre: 'Ana Gómez', documento: '34567890', email: 'ana@email.com', telefono: '3385550123', zona: 'Centro', rol: 'vecino', fechaRegistro: '01/08/2026', cantReclamos: 4 },
-    { id: 2, nombre: 'Carlos Ruiz', documento: '29888777', email: 'cruiz@email.com', telefono: '3385112233', zona: 'Norte', rol: 'municipio', fechaRegistro: '15/07/2026', cantReclamos: 0 }
-  ]);
-
-  const [zonas] = useState([
-    { id: 1, nombre: 'Centro', descripcion: 'Casco céntrico', activa: true },
-    { id: 2, nombre: 'Norte', descripcion: 'Barrios zona norte', activa: true }
-  ]);
-
-  const [categorias] = useState([
-    { id: 1, nombre: 'Alumbrado', activa: true },
-    { id: 2, nombre: 'Otro', activa: true }
-  ]);
-
-  // --- ESTADOS PARA MODALES Y FILTROS ---
-  const [filtroUsuario, setFiltroUsuario] = useState('');
-  
-
-  const usuariosFiltrados = usuarios.filter(u => 
-    `${u.nombre}`.toLowerCase().includes(filtroUsuario.toLowerCase()) || 
-    u.documento.includes(filtroUsuario) || 
-    u.email.toLowerCase().includes(filtroUsuario.toLowerCase())
-  );
+  const [cambiandoPassword, setCambiandoPassword] = useState(false);
 
   return (
     <div className="page-wrap" style={{ maxWidth: '1100px' }}>
@@ -42,7 +21,7 @@ const AdminPanel = () => {
           <p style={{ color: 'var(--texto-2)', fontSize: '0.9rem', margin: '0.2rem 0 0 0' }}>Gestión interna de Conectar Laboulaye</p>
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <button className="btn btn-outline" style={{ fontSize: '0.85rem' }}>Cambiar contraseña</button>
+          <button className="btn btn-outline" style={{ fontSize: '0.85rem' }} onClick={() => setCambiandoPassword(true)}>Cambiar contraseña</button>
           <span style={{ background: 'var(--brand-1)', color: '#fff', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <Icon name="shield" size={16} /> Municipio
           </span>
@@ -69,7 +48,7 @@ const AdminPanel = () => {
       </div>
 
       {/* ==================== RECLAMOS ==================== */}
-      {/* Conectada al back (SCRUM-81). Usuarios, Configuracion y Metricas siguen siendo maqueta. */}
+      {/* Conectada al back (SCRUM-81). Metricas sigue siendo maqueta hasta SCRUM-87. */}
       {activeTab === 'reclamos' && (
         <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
           <PanelReclamos />
@@ -84,99 +63,17 @@ const AdminPanel = () => {
         </div>
       )}
 
-      {/* ==================== USUARIOS (Solo lectura) ==================== */}
+      {/* ==================== USUARIOS (solo lectura) ==================== */}
       {activeTab === 'usuarios' && (
         <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <h2 style={{ fontSize: '1.2rem', margin: 0 }}>Directorio de Usuarios</h2>
-            <div className="field" style={{ margin: 0, width: '100%', maxWidth: '300px' }}>
-              <input 
-                type="text" 
-                placeholder="Buscar por Nombre, DNI o Email..." 
-                style={{ padding: '0.6rem' }} 
-                value={filtroUsuario}
-                onChange={(e) => setFiltroUsuario(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="card-box" style={{ padding: 0, overflow: 'hidden', overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead style={{ background: 'var(--fondo)', borderBottom: '2px solid var(--borde)' }}>
-                <tr>
-                  <th style={{ padding: '1rem', color: 'var(--texto-2)', fontSize: '0.9rem' }}>Vecino</th>
-                  <th style={{ padding: '1rem', color: 'var(--texto-2)', fontSize: '0.9rem' }}>DNI</th>
-                  <th style={{ padding: '1rem', color: 'var(--texto-2)', fontSize: '0.9rem' }}>Contacto</th>
-                  <th style={{ padding: '1rem', color: 'var(--texto-2)', fontSize: '0.9rem' }}>Zona</th>
-                  <th style={{ padding: '1rem', color: 'var(--texto-2)', fontSize: '0.9rem' }}>Registro</th>
-                  <th style={{ padding: '1rem', color: 'var(--texto-2)', fontSize: '0.9rem', textAlign: 'center' }}>Reclamos</th>
-                </tr>
-              </thead>
-              <tbody>
-                {usuariosFiltrados.map(user => (
-                  <tr key={user.id} style={{ borderBottom: '1px solid var(--borde)' }}>
-                    <td style={{ padding: '1rem', fontWeight: '500' }}>
-                      {user.nombre}
-                      <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--texto-3)', textTransform: 'uppercase' }}>{user.rol}</span>
-                    </td>
-                    <td style={{ padding: '1rem', color: 'var(--texto-2)' }}>{user.documento}</td>
-                    <td style={{ padding: '1rem', color: 'var(--texto-2)', fontSize: '0.85rem' }}>{user.email}<br/>{user.telefono}</td>
-                    <td style={{ padding: '1rem', color: 'var(--texto-2)' }}>{user.zona}</td>
-                    <td style={{ padding: '1rem', color: 'var(--texto-2)', fontSize: '0.9rem' }}>{user.fechaRegistro}</td>
-                    <td style={{ padding: '1rem', textAlign: 'center', fontWeight: 'bold' }}>{user.cantReclamos}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <PanelUsuarios />
         </div>
       )}
 
       {/* ==================== CONFIGURACIÓN ==================== */}
       {activeTab === 'configuracion' && (
-        <div style={{ animation: 'fadeIn 0.3s ease-out', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-          
-          {/* Zonas */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h2 style={{ fontSize: '1.2rem', margin: 0 }}>Zonas</h2>
-              <button className="link-btn"><Icon name="plus" size={20} /></button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {zonas.map(z => (
-                <div key={z.id} className="card-box" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem 1rem', opacity: z.activa ? 1 : 0.5 }}>
-                  <div>
-                    <strong style={{ display: 'block' }}>{z.nombre}</strong>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--texto-3)' }}>{z.descripcion}</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button className="link-btn"><Icon name="edit-2" size={16} /></button>
-                    <button className="link-btn" style={{ color: z.activa ? '#ef4444' : '#10b981' }}><Icon name={z.activa ? 'eye-off' : 'eye'} size={16} /></button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Categorías */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h2 style={{ fontSize: '1.2rem', margin: 0 }}>Categorías</h2>
-              <button className="link-btn"><Icon name="plus" size={20} /></button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {categorias.map(c => (
-                <div key={c.id} className="card-box" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem 1rem', opacity: c.activa ? 1 : 0.5 }}>
-                  <strong style={{ display: 'block' }}>{c.nombre}</strong>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button className="link-btn"><Icon name="edit-2" size={16} /></button>
-                    <button className="link-btn" style={{ color: c.activa ? '#ef4444' : '#10b981' }}><Icon name={c.activa ? 'eye-off' : 'eye'} size={16} /></button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
+        <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
+          <PanelConfiguracion />
         </div>
       )}
 
@@ -209,6 +106,7 @@ const AdminPanel = () => {
         </div>
       )}
 
+      {cambiandoPassword && <CambiarPassword onCerrar={() => setCambiandoPassword(false)} />}
     </div>
   );
 };

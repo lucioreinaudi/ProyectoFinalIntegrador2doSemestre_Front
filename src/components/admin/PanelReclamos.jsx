@@ -29,9 +29,10 @@ const PanelReclamos = () => {
     const cargando = resultado.clave !== clave;
 
     // Zonas y categorias para los filtros y la reclasificacion. Se piden una vez.
+    // Variante del panel: trae tambien las dadas de baja (siguen en los filtros, Q29).
     useEffect(() => {
         let activo = true;
-        Promise.all([api.get('/api/zonas'), api.get('/api/categorias')])
+        Promise.all([api.get('/api/admin/zonas'), api.get('/api/admin/categorias')])
             .then(([resZonas, resCategorias]) => {
                 if (!activo) return;
                 setZonas(resZonas.data);
