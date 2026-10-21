@@ -10,7 +10,6 @@ import FormAlerta from './FormAlerta';
 // las coordenadas exactas (Q10). Publicar no cambia el estado del reclamo.
 const PublicarReclamo = ({ reclamo, zonas, onPublicado, onCancelar }) => {
     const [modo, setModo] = useState('nueva'); // 'nueva' | 'vincular'
-    const [incluirFoto, setIncluirFoto] = useState(false);
 
     const [activas, setActivas] = useState(null);
     const [alertaId, setAlertaId] = useState('');
@@ -37,10 +36,13 @@ const PublicarReclamo = ({ reclamo, zonas, onPublicado, onCancelar }) => {
         zonaId: zonaDadaDeBaja ? '' : String(reclamo.zonaId),
     };
 
+    // Fotos del reclamo que el municipio puede elegir como imagen de la alerta (Q26).
+    // Reclamos viejos sin la lista "fotos" usan fotoUrl.
+    const fotosReclamo = reclamo.fotos?.length ? reclamo.fotos : (reclamo.fotoUrl ? [reclamo.fotoUrl] : []);
+
     const publicarNueva = async (datos) => {
         await api.post(`/api/admin/reclamos/${reclamo.id}/publicar`, {
             alerta: formularioABody(datos),
-            incluirFoto,
         });
         onPublicado('Reclamo publicado como alerta nueva. Se le avisó al vecino.');
     };
@@ -72,12 +74,7 @@ const PublicarReclamo = ({ reclamo, zonas, onPublicado, onCancelar }) => {
                     textoBoton="Publicar"
                     onGuardar={publicarNueva}
                     onCancelar={onCancelar}
-                    extra={reclamo.fotoUrl && (
-                        <label className="admin-campo check">
-                            <input type="checkbox" checked={incluirFoto} onChange={(e) => setIncluirFoto(e.target.checked)} />
-                            Usar la foto del reclamo en la alerta
-                        </label>
-                    )}
+                    fotosReclamo={fotosReclamo}
                 />
             )}
 

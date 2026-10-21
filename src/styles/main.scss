@@ -2344,3 +2344,71 @@ html[data-subrayar-enlaces] {
     flex-wrap: wrap;
     gap: .6rem;
 }
+
+/* ---------------- IMAGEN DE LA ALERTA (SCRUM-91) ---------------- */
+.imagen-alerta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .6rem;
+    padding: .8rem;
+    border: 1px dashed var(--borde-fuerte);
+    border-radius: var(--radius-s);
+    font-weight: 400;
+
+    .aviso {
+        margin-bottom: 0;
+        align-self: stretch;
+    }
+}
+
+.imagen-alerta-actual {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+
+    img {
+        width: 120px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: var(--radius-s);
+        border: 1px solid var(--borde);
+    }
+
+    div {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .2rem;
+    }
+}
+
+.imagen-alerta-opciones {
+    list-style: none;
+    margin: .3rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+
+    button {
+        padding: 0;
+        border: 2px solid transparent;
+        border-radius: var(--radius-s);
+        background: none;
+        cursor: pointer;
+        line-height: 0;
+
+        &[aria-pressed="true"] {
+            border-color: var(--brand-1);
+            box-shadow: var(--focus);
+        }
+    }
+
+    img {
+        width: 72px;
+        height: 72px;
+        object-fit: cover;
+        border-radius: calc(var(--radius-s) - 2px);
+    }
+}

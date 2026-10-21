@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { mensajeDeError } from '../../api/errores';
 import { NIVELES, TIPOS } from '../../features/alertas/alertas';
+import SelectorImagenAlerta from './SelectorImagenAlerta';
 
 // Formulario de alerta, reutilizado para crear, editar y "publicar reclamo como
 // alerta nueva". onGuardar(datos) devuelve una promesa: si falla, se muestra el
 // mensaje del back sin perder lo que se escribio.
-// extra: contenido adicional antes de los botones (ej. "incluir foto del reclamo").
-const FormAlerta = ({ inicial, zonas, textoBoton, onGuardar, onCancelar, extra }) => {
+// fotosReclamo: fotos del reclamo que se pueden elegir como imagen (solo al publicar).
+// extra: contenido adicional antes de los botones.
+const FormAlerta = ({ inicial, zonas, textoBoton, onGuardar, onCancelar, extra, fotosReclamo = [] }) => {
     const [datos, setDatos] = useState(inicial);
     const [enviando, setEnviando] = useState(false);
+    const [subiendoImagen, setSubiendoImagen] = useState(false);
     const [error, setError] = useState(null);
 
     const cambiar = (campo, valor) => setDatos((prev) => ({ ...prev, [campo]: valor }));
@@ -73,20 +76,19 @@ const FormAlerta = ({ inicial, zonas, textoBoton, onGuardar, onCancelar, extra }
                     onChange={(e) => cambiar('recomendaciones', e.target.value)} placeholder="Ej: Evitar circular por la zona" />
             </label>
 
-            {datos.imagenUrl && (
-                <div className="admin-campo">
-                    Imagen
-                    <img src={datos.imagenUrl} alt="Imagen de la alerta" className="detalle-foto" />
-                    <button type="button" className="link-btn" onClick={() => cambiar('imagenUrl', null)}>Quitar imagen</button>
-                </div>
-            )}
+            <SelectorImagenAlerta
+                imagenUrl={datos.imagenUrl}
+                onChange={(url) => cambiar('imagenUrl', url)}
+                fotosReclamo={fotosReclamo}
+                onSubiendo={setSubiendoImagen}
+            />
 
             {extra}
 
             {error && <div className="aviso error">{error}</div>}
 
             <div className="admin-reclamo-acciones">
-                <button type="submit" className="btn btn-primary btn-chico" disabled={enviando}>
+                <button type="submit" className="btn btn-primary btn-chico" disabled={enviando || subiendoImagen}>
                     {enviando ? 'Guardando...' : textoBoton}
                 </button>
                 {onCancelar && (
