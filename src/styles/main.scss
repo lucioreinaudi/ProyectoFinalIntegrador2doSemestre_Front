@@ -2669,3 +2669,103 @@ html[data-subrayar-enlaces] {
         }
     }
 }
+
+/* ---------------- METRICAS (SCRUM-87) ---------------- */
+.cargando-suave {
+    opacity: .6;
+    transition: opacity .2s;
+}
+
+.metricas-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: .8rem;
+    margin-bottom: 1.5rem;
+}
+
+.metrica-tarjeta {
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+    padding: 1rem 1.1rem;
+}
+
+.metrica-valor {
+    font-size: 1.9rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--texto-1);
+}
+
+.metrica-etiqueta {
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--texto-2);
+}
+
+.metrica-detalle {
+    font-size: .78rem;
+    color: var(--texto-3);
+}
+
+.metricas-graficos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.metrica-barras {
+    h3 {
+        margin: 0 0 .9rem;
+        font-size: .95rem;
+        color: var(--texto-1);
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: .55rem;
+    }
+
+    li {
+        display: grid;
+        grid-template-columns: minmax(80px, 34%) 1fr auto;
+        align-items: center;
+        gap: .6rem;
+        font-size: .85rem;
+    }
+}
+
+.barra-nombre {
+    color: var(--texto-2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+// Pista recesiva y relleno en el color de marca: una sola serie, un solo color.
+.barra-pista {
+    height: 10px;
+    background: var(--superficie-2);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.barra-relleno {
+    display: block;
+    height: 100%;
+    min-width: 2px;
+    background: var(--brand-1);
+    border-radius: 0 4px 4px 0;
+    transition: width .3s ease-out;
+}
+
+.barra-valor {
+    min-width: 1.6rem;
+    text-align: right;
+    font-weight: 700;
+    color: var(--texto-1);
+}

@@ -3,6 +3,7 @@ import Icon from '../components/Icon';
 import CambiarPassword from '../components/admin/CambiarPassword';
 import PanelAlertas from '../components/admin/PanelAlertas';
 import PanelConfiguracion from '../components/admin/PanelConfiguracion';
+import PanelMetricas from '../components/admin/PanelMetricas';
 import PanelReclamos from '../components/admin/PanelReclamos';
 import PanelUsuarios from '../components/admin/PanelUsuarios';
 
@@ -48,7 +49,7 @@ const AdminPanel = () => {
       </div>
 
       {/* ==================== RECLAMOS ==================== */}
-      {/* Conectada al back (SCRUM-81). Metricas sigue siendo maqueta hasta SCRUM-87. */}
+      {/* Todas las pestanas estan conectadas al back (Metricas desde SCRUM-87). */}
       {activeTab === 'reclamos' && (
         <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
           <PanelReclamos />
@@ -80,29 +81,7 @@ const AdminPanel = () => {
       {/* ==================== MÉTRICAS ==================== */}
       {activeTab === 'metricas' && (
         <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
-          <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Métricas en tiempo real</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-            <div className="card-box" style={{ textAlign: 'center', borderTop: '4px solid var(--brand-1)' }}>
-              <span style={{ display: 'block', fontSize: '2rem', fontWeight: '900', color: 'var(--texto-1)' }}>342</span>
-              <span style={{ color: 'var(--texto-2)', fontSize: '0.9rem' }}>Reclamos Históricos</span>
-            </div>
-            <div className="card-box" style={{ textAlign: 'center', borderTop: '4px solid #10b981' }}>
-              <span style={{ display: 'block', fontSize: '2rem', fontWeight: '900', color: 'var(--texto-1)' }}>215</span>
-              <span style={{ color: 'var(--texto-2)', fontSize: '0.9rem' }}>Resueltos</span>
-            </div>
-            <div className="card-box" style={{ textAlign: 'center', borderTop: '4px solid #ef4444' }}>
-              <span style={{ display: 'block', fontSize: '2rem', fontWeight: '900', color: 'var(--texto-1)' }}>12</span>
-              <span style={{ color: 'var(--texto-2)', fontSize: '0.9rem' }}>Alertas Activas</span>
-            </div>
-            <div className="card-box" style={{ textAlign: 'center', borderTop: '4px solid #8b5cf6' }}>
-              <span style={{ display: 'block', fontSize: '2rem', fontWeight: '900', color: 'var(--texto-1)' }}>1,250</span>
-              <span style={{ color: 'var(--texto-2)', fontSize: '0.9rem' }}>Vecinos Registrados</span>
-            </div>
-            <div className="card-box" style={{ textAlign: 'center', borderTop: '4px solid #f59e0b' }}>
-              <span style={{ display: 'block', fontSize: '2rem', fontWeight: '900', color: 'var(--texto-1)' }}>4.2 días</span>
-              <span style={{ color: 'var(--texto-2)', fontSize: '0.9rem' }}>Tpo. Promedio Resolución</span>
-            </div>
-          </div>
+          <PanelMetricas />
         </div>
       )}
 
