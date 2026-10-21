@@ -2671,6 +2671,8 @@ html[data-subrayar-enlaces] {
 }
 
 /* ---------------- METRICAS (SCRUM-87) ---------------- */
+// Mismo lenguaje visual que el Home: tarjetas tipo .quick-card (icono en un
+// cuadradito, la principal en el color de marca) y encabezados con icono.
 .cargando-suave {
     opacity: .6;
     transition: opacity .2s;
@@ -2678,27 +2680,59 @@ html[data-subrayar-enlaces] {
 
 .metricas-tarjetas {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: .8rem;
-    margin-bottom: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: .85rem;
+    margin-bottom: 1.25rem;
 }
 
 .metrica-tarjeta {
     display: flex;
     flex-direction: column;
-    gap: .2rem;
-    padding: 1rem 1.1rem;
+    gap: .25rem;
+    padding: 1.1rem;
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radius-m);
+    box-shadow: var(--sombra);
+}
+
+.metrica-icono {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: .35rem;
+    background: var(--info-bg);
+    color: var(--brand-1);
+}
+
+.metrica-tarjeta.tono-bajo .metrica-icono {
+    background: var(--bajo-bg);
+    color: var(--bajo-icono);
+}
+
+.metrica-tarjeta.tono-medio .metrica-icono {
+    background: var(--medio-bg);
+    color: var(--medio-icono);
+}
+
+.metrica-tarjeta.tono-alto .metrica-icono {
+    background: var(--alto-bg);
+    color: var(--alto-icono);
 }
 
 .metrica-valor {
-    font-size: 1.9rem;
+    font-size: 1.85rem;
     font-weight: 800;
     line-height: 1.1;
     color: var(--texto-1);
+    letter-spacing: -.01em;
 }
 
 .metrica-etiqueta {
-    font-size: .88rem;
+    font-size: .9rem;
     font-weight: 700;
     color: var(--texto-2);
 }
@@ -2708,34 +2742,78 @@ html[data-subrayar-enlaces] {
     color: var(--texto-3);
 }
 
+// La principal, como .quick-card.primary del Home.
+.metrica-tarjeta.destacada {
+    background: var(--brand-fondo);
+    border-color: var(--brand-fondo);
+
+    .metrica-icono {
+        background: rgba(255, 255, 255, .2);
+        color: #fff;
+    }
+
+    .metrica-valor,
+    .metrica-etiqueta {
+        color: #fff;
+    }
+
+    .metrica-detalle {
+        color: #DCEAFA;
+    }
+}
+
 .metricas-graficos {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1rem;
+    gap: .85rem;
 }
 
-.metrica-barras {
+.metrica-grafico {
+    padding: 1.1rem 1.2rem 1.2rem;
+}
+
+.metrica-grafico-head {
+    margin-bottom: 1rem;
+    flex-wrap: nowrap;
+
     h3 {
-        margin: 0 0 .9rem;
-        font-size: .95rem;
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 800;
         color: var(--texto-1);
     }
 
-    ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        gap: .55rem;
+    p {
+        margin: .1rem 0 0;
+        font-size: .8rem;
+        color: var(--texto-3);
     }
+}
+
+.metrica-barras {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .7rem;
 
     li {
         display: grid;
-        grid-template-columns: minmax(80px, 34%) 1fr auto;
+        grid-template-columns: minmax(90px, 36%) 1fr 3.6rem;
         align-items: center;
-        gap: .6rem;
-        font-size: .85rem;
+        gap: .7rem;
+        font-size: .86rem;
+        cursor: default;
+    }
+
+    li:hover .barra-relleno {
+        background: var(--brand-3);
+    }
+
+    // Los que estan en 0 se atenuan, pero se muestran (que no haya ninguno tambien es un dato).
+    li.vacia {
+        opacity: .55;
     }
 }
 
@@ -2747,25 +2825,34 @@ html[data-subrayar-enlaces] {
 }
 
 // Pista recesiva y relleno en el color de marca: una sola serie, un solo color.
+// El extremo con datos va redondeado; el que arranca en la base, recto.
 .barra-pista {
-    height: 10px;
+    height: 12px;
     background: var(--superficie-2);
-    border-radius: 4px;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
     overflow: hidden;
 }
 
 .barra-relleno {
     display: block;
     height: 100%;
-    min-width: 2px;
     background: var(--brand-1);
-    border-radius: 0 4px 4px 0;
-    transition: width .3s ease-out;
+    border-radius: 0 5px 5px 0;
+    transition: width .4s ease-out, background .15s;
 }
 
 .barra-valor {
-    min-width: 1.6rem;
-    text-align: right;
-    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.1;
+    font-weight: 800;
     color: var(--texto-1);
+
+    small {
+        font-size: .72rem;
+        font-weight: 600;
+        color: var(--texto-3);
+    }
 }
