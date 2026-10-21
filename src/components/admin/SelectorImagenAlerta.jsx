@@ -9,9 +9,10 @@ import Icon from '../Icon';
 // - una imagen subida desde su computadora (se sube al elegirla),
 // - ninguna: el Home usa la imagen de referencia segun el tipo de alerta.
 // onSubiendo(true/false) avisa al formulario para que no se guarde a mitad de una subida.
-// titulo y textoSinImagen permiten reutilizarlo para la imagen de un tipo de alerta.
+// titulo, textoSinImagen y subir permiten reutilizarlo para la imagen de un tipo de
+// alerta (subir: la funcion que sube el archivo y devuelve su URL).
 const SelectorImagenAlerta = ({
-    imagenUrl, onChange, fotosReclamo = [], onSubiendo,
+    imagenUrl, onChange, fotosReclamo = [], onSubiendo, subir = subirImagenAlerta,
     titulo = 'Imagen de la alerta',
     textoSinImagen = 'Sin imagen: en el Home se muestra la imagen de referencia según el tipo.',
 }) => {
@@ -33,7 +34,7 @@ const SelectorImagenAlerta = ({
         setSubiendo(true);
         onSubiendo?.(true);
         try {
-            onChange(await subirImagenAlerta(archivo));
+            onChange(await subir(archivo));
         } catch (err) {
             setError(mensajeDeError(err, 'No se pudo subir la imagen'));
         } finally {

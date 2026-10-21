@@ -32,28 +32,16 @@ export default function useTiposAlerta() {
     return tipos
 }
 
-// Imagenes incluidas en el front para los tipos originales. Se usan mientras el
-// municipio no les cargue una imagen propia desde Configuracion.
-const IMAGEN_INCLUIDA = {
-    tormenta: '/img/alertas/tormenta.jpg',
-    viento: '/img/alertas/viento.jpg',
-    electricidad: '/img/alertas/electricidad.jpg',
-    arbol: '/img/alertas/arbol.jpg',
-}
-
-// Nombre, icono e imagen de referencia de un tipo, por su clave.
+// Nombre, icono e imagen de referencia de un tipo, por su clave. Todas las
+// imagenes viven en Supabase (se cargan desde Configuracion); si un tipo no tiene,
+// se muestra su icono.
 export function infoTipo(clave, tipos) {
     const tipo = tipos.find((t) => t.clave === clave)
     return {
         nombre: tipo?.nombre || clave,
         icono: tipo?.icono || 'alert-triangle',
-        imagen: tipo?.imagenUrl || IMAGEN_INCLUIDA[clave] || null,
-        imagenPropia: !!tipo?.imagenUrl,
+        imagen: tipo?.imagenUrl || null,
     }
-}
-
-export function imagenIncluida(clave) {
-    return IMAGEN_INCLUIDA[clave] || null
 }
 
 // Mismos iconos que acepta el back (TipoAlertaService.ICONOS).

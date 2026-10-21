@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import { mensajeDeError } from '../../api/errores';
-import { ICONOS, imagenIncluida, invalidarTiposAlerta } from '../../features/alertas/tiposAlerta';
+import { subirImagenTipoAlerta } from '../../features/alertas/imagen';
+import { ICONOS, invalidarTiposAlerta } from '../../features/alertas/tiposAlerta';
 import Icon from '../Icon';
 import Modal from './Modal';
 import SelectorImagenAlerta from './SelectorImagenAlerta';
@@ -82,7 +83,7 @@ const ListaTiposAlerta = () => {
 
             <ul className={`tipos-grid ${cargando ? 'cargando' : ''}`}>
                 {datos.map((item) => {
-                    const imagen = item.imagenUrl || imagenIncluida(item.clave);
+                    const imagen = item.imagenUrl;
                     return (
                         <li key={item.id} className={`card-box tipo-item ${item.activa ? '' : 'inactiva'}`}>
                             <div className="tipo-imagen">
@@ -94,7 +95,7 @@ const ListaTiposAlerta = () => {
                                     {!item.activa && <span className="chip inactiva">Dado de baja</span>}
                                 </div>
                                 <span className="admin-reclamo-meta">
-                                    {item.imagenUrl ? 'Imagen propia' : (imagen ? 'Imagen incluida en la página' : 'Sin imagen: se muestra el ícono')}
+                                    {imagen ? 'Con imagen de referencia' : 'Sin imagen: se muestra el ícono'}
                                 </span>
                                 <div className="admin-reclamo-acciones">
                                     <button type="button" className="btn btn-outline btn-chico" disabled={ocupadoId === item.id}
@@ -143,8 +144,6 @@ const FormTipo = ({ inicial, onGuardar, onCancelar }) => {
         }
     };
 
-    const incluida = inicial.clave ? imagenIncluida(inicial.clave) : null;
-
     return (
         <form className="admin-form" onSubmit={enviar}>
             <label className="admin-campo">
@@ -167,9 +166,8 @@ const FormTipo = ({ inicial, onGuardar, onCancelar }) => {
 
             <SelectorImagenAlerta
                 titulo="Imagen de referencia"
-                textoSinImagen={incluida
-                    ? 'Sin imagen propia: se usa la imagen incluida en la página.'
-                    : 'Sin imagen: en el Home se muestra el ícono del tipo.'}
+                textoSinImagen="Sin imagen: en el Home se muestra el ícono del tipo."
+                subir={subirImagenTipoAlerta}
                 imagenUrl={datos.imagenUrl}
                 onChange={(url) => setDatos({ ...datos, imagenUrl: url })}
                 onSubiendo={setSubiendo}
