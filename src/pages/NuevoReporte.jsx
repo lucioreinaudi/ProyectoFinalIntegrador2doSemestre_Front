@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import Icon from '../components/Icon';
 import LocationPicker from '../components/LocationPicker';
 import SelectorFotos from '../components/SelectorFotos';
 import api from '../api/client';
