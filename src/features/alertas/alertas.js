@@ -1,34 +1,14 @@
-// Valores que aceptan los CHECK de la tabla Alerta en la BD (y AlertaService en el back).
+// Niveles: mismos valores que el CHECK de nivel_gravedad en la BD (y AlertaService en el back).
 export const NIVELES = [
     { valor: 'alto', label: 'Alto' },
     { valor: 'medio', label: 'Medio' },
     { valor: 'bajo', label: 'Bajo' },
 ]
 
-export const TIPOS = [
-    { valor: 'tormenta', label: 'Tormenta' },
-    { valor: 'viento', label: 'Viento' },
-    { valor: 'electricidad', label: 'Electricidad' },
-    { valor: 'arbol', label: 'Árbol' },
-    { valor: 'otro', label: 'Otro' },
-]
-
-export function labelTipo(tipo) {
-    return TIPOS.find((t) => t.valor === tipo)?.label || tipo
-}
+// Los tipos de alerta ya no son una lista fija: vienen del back (ver tiposAlerta.js).
 
 // Como se muestra el nivel en lo publico (Home, /alertas, detalle).
 export const NIVEL_LABEL = { alto: 'Nivel alto', medio: 'Precaución', bajo: 'Informativo' }
-
-// Icono de cada tipo. AlertsList lo usa tambien para elegir la foto de
-// referencia cuando la alerta no tiene imagen propia.
-const ICONO_POR_TIPO = {
-    tormenta: 'cloud-rain',
-    viento: 'wind',
-    electricidad: 'zap',
-    arbol: 'tree',
-    otro: 'alert-triangle',
-}
 
 // "Hoy · 16:45 hs", "Ayer · 09:10 hs" o "12/10 · 18:20 hs".
 export function formatearHoraAlerta(fechaIso) {
@@ -58,7 +38,7 @@ export function alertaParaVista(a) {
         zona: a.zonaNombre,
         hora: formatearHoraAlerta(a.fechaEmision),
         fechaEmision: a.fechaEmision,
-        foto: ICONO_POR_TIPO[a.tipo] || 'alert-triangle',
+        tipo: a.tipo,
         imagenUrl: a.imagenUrl,
         estado: a.estado,
         cantidadReclamos: a.cantidadReclamos,

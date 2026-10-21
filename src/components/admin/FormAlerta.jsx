@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { mensajeDeError } from '../../api/errores';
-import { NIVELES, TIPOS } from '../../features/alertas/alertas';
+import { NIVELES } from '../../features/alertas/alertas';
+import useTiposAlerta from '../../features/alertas/tiposAlerta';
 import SelectorImagenAlerta from './SelectorImagenAlerta';
 
 // Formulario de alerta, reutilizado para crear, editar y "publicar reclamo como
@@ -12,6 +13,9 @@ const FormAlerta = ({ inicial, zonas, textoBoton, onGuardar, onCancelar, extra, 
     const [datos, setDatos] = useState(inicial);
     const [enviando, setEnviando] = useState(false);
     const [subiendoImagen, setSubiendoImagen] = useState(false);
+    const tiposAlerta = useTiposAlerta();
+    // Solo los activos; el que ya tenia la alerta se muestra aunque este dado de baja.
+    const tiposVisibles = tiposAlerta.filter((t) => t.activa || t.clave === inicial.tipo);
     const [error, setError] = useState(null);
 
     const cambiar = (campo, valor) => setDatos((prev) => ({ ...prev, [campo]: valor }));
@@ -50,7 +54,10 @@ const FormAlerta = ({ inicial, zonas, textoBoton, onGuardar, onCancelar, extra, 
                 <label className="admin-campo">
                     Tipo
                     <select value={datos.tipo} onChange={(e) => cambiar('tipo', e.target.value)}>
-                        {TIPOS.map((t) => <option key={t.valor} value={t.valor}>{t.label}</option>)}
+                        {tiposVisibles.length === 0 && <option value={datos.tipo}>{datos.tipo}</option>}
+                        {tiposVisibles.map((t) => (
+                            <option key={t.clave} value={t.clave}>{t.activa ? t.nombre : `${t.nombre} (dado de baja)`}</option>
+                        ))}
                     </select>
                 </label>
                 <label className="admin-campo">

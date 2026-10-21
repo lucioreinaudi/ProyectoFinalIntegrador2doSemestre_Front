@@ -2,27 +2,22 @@ import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from './Icon';
 import { NIVEL_LABEL } from '../features/alertas/alertas';
-
-// Foto de referencia por tipo de alerta (cambiar una = reemplazar el archivo en public/img/alertas/)
-const FOTO_REFERENCIA = {
-    'cloud-rain': '/img/alertas/tormenta.jpg',
-    wind: '/img/alertas/viento.jpg',
-    zap: '/img/alertas/electricidad.jpg',
-    tree: '/img/alertas/arbol.jpg',
-};
+import useTiposAlerta, { infoTipo } from '../features/alertas/tiposAlerta';
 
 
 // Exportada para reutilizarla en el detalle de la alerta.
 export const FotoAlerta = ({ alerta: a }) => {
     const [falla, setFalla] = useState(false);
-    // Foto real subida por el municipio; si no hay, la de referencia por tipo.
-    const src = a.imagenUrl || FOTO_REFERENCIA[a.foto];
+    // Foto real de la alerta; si no hay, la imagen de referencia de su tipo
+    // (la que cargo el municipio en Configuracion, o la incluida en el front).
+    const tipo = infoTipo(a.tipo, useTiposAlerta());
+    const src = a.imagenUrl || tipo.imagen;
     const esReferencia = !a.imagenUrl;
 
     if (!src || falla) {
         return (
             <div className={`af-photo nivel-${a.nivel}`}>
-                <Icon name={a.foto || 'alert-triangle'} size={80} />
+                <Icon name={tipo.icono} size={80} />
                 <span className="cap">Imagen ilustrativa</span>
             </div>
         );

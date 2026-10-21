@@ -1,6 +1,7 @@
 import ListaCatalogo from './ListaCatalogo';
+import ListaTiposAlerta from './ListaTiposAlerta';
 
-// Pestana Configuracion (Q12, seccion 7.2): zonas y categorias.
+// Pestana Configuracion (Q12, seccion 7.2): zonas, categorias y tipos de alerta (SCRUM-94).
 // Dar de baja = desaparecen de "Reportar problema" y de los formularios del panel,
 // pero siguen en los filtros y en los reclamos/alertas que ya las usan (Q16, Q29).
 const PanelConfiguracion = () => (
@@ -12,6 +13,9 @@ const PanelConfiguracion = () => (
         <div className="configuracion-grid">
             <ListaCatalogo tipo="zonas" titulo="Zonas" singular="Zona" conDescripcion />
             <ListaCatalogo tipo="categorias" titulo="Categorías" singular="Categoría" />
+        </div>
+        <div className="configuracion-seccion">
+            <ListaTiposAlerta />
         </div>
     </div>
 );

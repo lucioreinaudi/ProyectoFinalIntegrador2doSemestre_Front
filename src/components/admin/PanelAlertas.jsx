@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import { mensajeDeError } from '../../api/errores';
-import { ALERTA_VACIA, NIVELES, alertaAFormulario, formularioABody, labelTipo } from '../../features/alertas/alertas';
+import { ALERTA_VACIA, NIVELES, alertaAFormulario, formularioABody } from '../../features/alertas/alertas';
+import useTiposAlerta, { infoTipo } from '../../features/alertas/tiposAlerta';
 import { formatearFechaHora } from '../../features/reclamos/formato';
 import Icon from '../Icon';
 import FormAlerta from './FormAlerta';
@@ -23,6 +24,7 @@ const PanelAlertas = () => {
     const [aviso, setAviso] = useState(null); // { tipo: 'ok' | 'error', texto }
     const [confirmarEliminar, setConfirmarEliminar] = useState(null); // id de la alerta
     const [ocupadoId, setOcupadoId] = useState(null); // alerta con una accion en curso
+    const tiposAlerta = useTiposAlerta();
 
     const clave = String(recarga);
     const cargando = resultado.clave !== clave;
@@ -150,7 +152,7 @@ const PanelAlertas = () => {
                                     <span className="chip zona">{a.zonaNombre}</span>
                                 </div>
                                 <span className="admin-reclamo-meta">
-                                    {formatearFechaHora(a.fechaEmision)} · {labelTipo(a.tipo)} · Origen:{' '}
+                                    {formatearFechaHora(a.fechaEmision)} · {infoTipo(a.tipo, tiposAlerta).nombre} · Origen:{' '}
                                     {a.cantidadReclamos > 0 ? `Desde reclamos (${a.cantidadReclamos})` : 'Municipio'}
                                 </span>
                             </div>

@@ -9,7 +9,12 @@ import Icon from '../Icon';
 // - una imagen subida desde su computadora (se sube al elegirla),
 // - ninguna: el Home usa la imagen de referencia segun el tipo de alerta.
 // onSubiendo(true/false) avisa al formulario para que no se guarde a mitad de una subida.
-const SelectorImagenAlerta = ({ imagenUrl, onChange, fotosReclamo = [], onSubiendo }) => {
+// titulo y textoSinImagen permiten reutilizarlo para la imagen de un tipo de alerta.
+const SelectorImagenAlerta = ({
+    imagenUrl, onChange, fotosReclamo = [], onSubiendo,
+    titulo = 'Imagen de la alerta',
+    textoSinImagen = 'Sin imagen: en el Home se muestra la imagen de referencia según el tipo.',
+}) => {
     const inputRef = useRef(null);
     const [subiendo, setSubiendo] = useState(false);
     const [error, setError] = useState(null);
@@ -41,7 +46,7 @@ const SelectorImagenAlerta = ({ imagenUrl, onChange, fotosReclamo = [], onSubien
 
     return (
         <div className="admin-campo">
-            Imagen de la alerta
+            {titulo}
 
             <div className="imagen-alerta">
                 {imagenUrl ? (
@@ -57,7 +62,7 @@ const SelectorImagenAlerta = ({ imagenUrl, onChange, fotosReclamo = [], onSubien
                         </div>
                     </div>
                 ) : (
-                    <p className="detalle-vacio">Sin imagen: en el Home se muestra la imagen de referencia según el tipo.</p>
+                    <p className="detalle-vacio">{textoSinImagen}</p>
                 )}
 
                 {fotosReclamo.length > 0 && (
