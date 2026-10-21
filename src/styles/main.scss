@@ -1160,6 +1160,18 @@ main:focus {
     color: var(--texto-2);
     font-size: .94rem;
     margin-bottom: 1rem;
+    overflow-wrap: anywhere; // una palabra larguisima (o un link) no rompe la tarjeta
+}
+
+// En las tarjetas del Home y de /alertas la descripcion se corta a 4 lineas con
+// "...": el texto completo esta en "Ver alerta completa". Asi una alerta con mucho
+// texto no estira la tarjeta ni la foto.
+.alertas-list .af-desc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    overflow: hidden;
 }
 
 .af-photo {
@@ -2854,5 +2866,18 @@ html[data-subrayar-enlaces] {
         font-size: .72rem;
         font-weight: 600;
         color: var(--texto-3);
+    }
+}
+
+/* ---------------- LIMITE DE TEXTO EN ALERTAS ---------------- */
+.contador {
+    align-self: flex-end;
+    font-size: .74rem;
+    font-weight: 400;
+    color: var(--texto-3);
+
+    &.cerca {
+        color: var(--alto-texto);
+        font-weight: 700;
     }
 }

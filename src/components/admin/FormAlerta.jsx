@@ -9,6 +9,16 @@ import SelectorImagenAlerta from './SelectorImagenAlerta';
 // mensaje del back sin perder lo que se escribio.
 // fotosReclamo: fotos del reclamo que se pueden elegir como imagen (solo al publicar).
 // extra: contenido adicional antes de los botones.
+
+// Mismo limite que el back (AlertaCrearRequest).
+const MAX_TEXTO = 1000;
+
+// "123 / 1000" debajo de un campo largo; se marca cuando se esta llegando al limite.
+const Contador = ({ texto }) => (
+    <span className={`contador ${texto.length > MAX_TEXTO * 0.9 ? 'cerca' : ''}`}>
+        {texto.length} / {MAX_TEXTO}
+    </span>
+);
 const FormAlerta = ({ inicial, zonas, textoBoton, onGuardar, onCancelar, extra, fotosReclamo = [] }) => {
     const [datos, setDatos] = useState(inicial);
     const [enviando, setEnviando] = useState(false);
@@ -73,14 +83,16 @@ const FormAlerta = ({ inicial, zonas, textoBoton, onGuardar, onCancelar, extra, 
 
             <label className="admin-campo">
                 Descripción
-                <textarea rows="4" required value={datos.descripcion}
+                <textarea rows="4" required maxLength={MAX_TEXTO} value={datos.descripcion}
                     onChange={(e) => cambiar('descripcion', e.target.value)} placeholder="Qué está pasando (esto lo ven los vecinos)" />
+                <Contador texto={datos.descripcion} />
             </label>
 
             <label className="admin-campo">
                 Recomendaciones (opcional)
-                <textarea rows="2" value={datos.recomendaciones}
+                <textarea rows="2" maxLength={MAX_TEXTO} value={datos.recomendaciones}
                     onChange={(e) => cambiar('recomendaciones', e.target.value)} placeholder="Ej: Evitar circular por la zona" />
+                <Contador texto={datos.recomendaciones} />
             </label>
 
             <SelectorImagenAlerta
