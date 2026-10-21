@@ -24,7 +24,7 @@ const DetalleAlerta = () => {
     const a = resultado.alerta;
 
     return (
-        <div className="page-wrap">
+        <div className="page-wrap detalle-alerta-wrap">
             <Link to="/alertas" className="link-btn volver">
                 <Icon name="left" size={16} /> Todas las alertas
             </Link>
@@ -39,41 +39,61 @@ const DetalleAlerta = () => {
             )}
 
             {!cargando && a && (
-                <article className={`alert-feature nivel-${a.nivel} alerta-detalle`}>
-                    <div>
-                        <div className="af-head">
-                            <span className={`af-icon nivel-${a.nivel}`}>
-                                <Icon name="alert-triangle" size={22} />
-                            </span>
-                            <div>
-                                {a.estado === 'activa'
-                                    ? <span className="chip estado-activa">ALERTA ACTIVA</span>
-                                    : <span className="chip">ALERTA FINALIZADA</span>}
-                                <h1 className="alerta-detalle-titulo">{a.titulo}</h1>
-                                <div className="af-meta">
-                                    <span className="chip zona"><Icon name="map" size={12} /> {a.zona}</span>
-                                    <span className={`chip nivel-${a.nivel}`}>{NIVEL_LABEL[a.nivel]}</span>
-                                </div>
-                                <div className="af-fecha"><Icon name="clock" size={15} /> {a.hora}</div>
+                <article className={`detalle-alerta nivel-${a.nivel}`}>
+                    {/* ENCABEZADO: estado, titulo y datos principales */}
+                    <header className="detalle-alerta-head">
+                        <span className={`af-icon nivel-${a.nivel}`}>
+                            <Icon name="alert-triangle" size={22} />
+                        </span>
+                        <div>
+                            {a.estado === 'activa'
+                                ? <span className="chip estado-activa">ALERTA ACTIVA</span>
+                                : <span className="chip">ALERTA FINALIZADA</span>}
+                            <h1 className="alerta-detalle-titulo">{a.titulo}</h1>
+                            <div className="af-meta">
+                                <span className="chip zona"><Icon name="map" size={12} /> {a.zona}</span>
+                                <span className={`chip nivel-${a.nivel}`}>{NIVEL_LABEL[a.nivel]}</span>
+                                <span className="af-fecha"><Icon name="clock" size={15} /> {a.hora}</span>
                             </div>
                         </div>
+                    </header>
 
-                        <p className="af-desc">{a.desc}</p>
+                    {a.estado !== 'activa' && (
+                        <div className="aviso info">Esta alerta ya finalizó: la información puede no estar vigente.</div>
+                    )}
 
-                        {a.recomendaciones && (
-                            <div className="alerta-recomendaciones">
-                                <h2>Recomendaciones</h2>
-                                <p>{a.recomendaciones}</p>
+                    <div className="detalle-alerta-cuerpo">
+                        {/* TEXTO: lo que paso y que hacer */}
+                        <div className="detalle-alerta-texto">
+                            <h2>Qué está pasando</h2>
+                            <p className="detalle-alerta-desc">{a.desc}</p>
+
+                            {a.recomendaciones && (
+                                <div className="alerta-recomendaciones">
+                                    <h2><Icon name="info" size={16} /> Recomendaciones</h2>
+                                    <p>{a.recomendaciones}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* LATERAL: foto con proporcion fija (no se estira con el texto) y datos */}
+                        <aside className="detalle-alerta-lateral">
+                            <div className="detalle-alerta-foto">
+                                <FotoAlerta alerta={a} />
                             </div>
-                        )}
-
-                        {a.cantidadReclamos > 0 && (
-                            <p className="alerta-reportes">
-                                <Icon name="user" size={15} /> Reportado por {a.cantidadReclamos} vecino{a.cantidadReclamos === 1 ? '' : 's'}
-                            </p>
-                        )}
+                            <dl className="detalle-alerta-datos">
+                                <div><dt>Zona</dt><dd>{a.zona}</dd></div>
+                                <div><dt>Nivel</dt><dd>{NIVEL_LABEL[a.nivel]}</dd></div>
+                                <div><dt>Emitida</dt><dd>{a.hora}</dd></div>
+                                {a.cantidadReclamos > 0 && (
+                                    <div>
+                                        <dt>Reportes</dt>
+                                        <dd>{a.cantidadReclamos} vecino{a.cantidadReclamos === 1 ? '' : 's'}</dd>
+                                    </div>
+                                )}
+                            </dl>
+                        </aside>
                     </div>
-                    <FotoAlerta alerta={a} />
                 </article>
             )}
         </div>

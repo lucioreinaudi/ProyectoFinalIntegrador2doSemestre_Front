@@ -2315,40 +2315,6 @@ html[data-subrayar-enlaces] {
     text-decoration: none;
 }
 
-.alerta-detalle-titulo {
-    font-size: 1.4rem;
-    margin: .4rem 0;
-    color: var(--texto-1);
-}
-
-.alerta-recomendaciones {
-    margin-top: 1rem;
-
-    h2 {
-        font-size: .8rem;
-        text-transform: uppercase;
-        letter-spacing: .05em;
-        color: var(--texto-3);
-        margin: 0 0 .3rem;
-    }
-
-    p {
-        margin: 0;
-        color: var(--texto-1);
-        white-space: pre-line;
-    }
-}
-
-.alerta-reportes {
-    display: flex;
-    align-items: center;
-    gap: .35rem;
-    margin-top: 1rem;
-    font-size: .88rem;
-    font-weight: 700;
-    color: var(--texto-2);
-}
-
 /* ---------------- MOSTRAR MAS ALERTAS (SCRUM-89) ---------------- */
 .mostrar-mas {
     display: flex;
@@ -2879,5 +2845,164 @@ html[data-subrayar-enlaces] {
     &.cerca {
         color: var(--alto-texto);
         font-weight: 700;
+    }
+}
+
+/* ---------------- DETALLE DE ALERTA ---------------- */
+// Pagina propia, mas ancha que el resto (page-wrap mide 44rem): texto a la
+// izquierda y una columna lateral con la foto (proporcion fija) y los datos.
+.detalle-alerta-wrap {
+    max-width: 64rem;
+}
+
+.detalle-alerta {
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-left: 6px solid var(--borde);
+    border-radius: var(--radius-l);
+    box-shadow: var(--sombra);
+    padding: 1.5rem;
+
+    &.nivel-alto { border-left-color: var(--alto-icono); }
+    &.nivel-medio { border-left-color: var(--medio-icono); }
+    &.nivel-bajo { border-left-color: var(--bajo-icono); }
+
+    .aviso {
+        margin: 1rem 0 0;
+    }
+}
+
+.detalle-alerta-head {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--borde);
+
+    > div {
+        min-width: 0;
+    }
+
+    .af-meta {
+        margin-bottom: 0;
+    }
+}
+
+.alerta-detalle-titulo {
+    margin: .5rem 0 .6rem;
+    font-size: clamp(1.35rem, 2.6vw, 1.8rem);
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--texto-1);
+    overflow-wrap: anywhere;
+}
+
+.detalle-alerta-cuerpo {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 1.4rem;
+
+    > * {
+        min-width: 0;
+    }
+
+    @media (min-width: 860px) {
+        grid-template-columns: minmax(0, 1fr) 20rem;
+        gap: 2rem;
+    }
+}
+
+// En el celular la foto va primero.
+.detalle-alerta-lateral {
+    order: -1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    @media (min-width: 860px) {
+        order: 0;
+        position: sticky;
+        top: 5.5rem;
+        align-self: start;
+    }
+}
+
+.detalle-alerta-texto h2 {
+    margin: 0 0 .5rem;
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--texto-3);
+}
+
+.detalle-alerta-desc {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--texto-1);
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    max-width: 70ch; // lineas comodas de leer aunque la pantalla sea ancha
+}
+
+// Recomendaciones en un recuadro, como los avisos informativos de la pagina.
+.alerta-recomendaciones {
+    margin-top: 1.5rem;
+    padding: 1rem 1.1rem;
+    background: var(--info-bg);
+    border: 1px solid var(--info-borde);
+    border-radius: var(--radius-m);
+
+    h2 {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        color: var(--info-texto);
+    }
+
+    p {
+        margin: 0;
+        color: var(--texto-1);
+        line-height: 1.6;
+        white-space: pre-line;
+        overflow-wrap: anywhere;
+    }
+}
+
+// La foto tiene proporcion fija: no depende del largo del texto.
+.detalle-alerta-foto .af-photo {
+    aspect-ratio: 4 / 3;
+    min-height: 0;
+    width: 100%;
+}
+
+.detalle-alerta-datos {
+    margin: 0;
+    padding: .9rem 1rem;
+    background: var(--superficie-2);
+    border: 1px solid var(--borde);
+    border-radius: var(--radius-m);
+    display: flex;
+    flex-direction: column;
+    gap: .55rem;
+
+    > div {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        font-size: .88rem;
+    }
+
+    dt {
+        color: var(--texto-3);
+        font-weight: 600;
+    }
+
+    dd {
+        margin: 0;
+        color: var(--texto-1);
+        font-weight: 700;
+        text-align: right;
     }
 }
