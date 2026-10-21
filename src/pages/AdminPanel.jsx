@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Icon from '../components/Icon';
 import CambiarPassword from '../components/admin/CambiarPassword';
 import PanelAlertas from '../components/admin/PanelAlertas';

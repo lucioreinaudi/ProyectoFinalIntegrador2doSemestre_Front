@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from './Icon';
 import { NIVEL_LABEL } from '../features/alertas/alertas';

@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import Icon from './Icon';
 

@@ -17,5 +17,10 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      // const { campo, ...resto } = obj es la forma comun de sacar un campo de un objeto
+      // (ej. MiCuenta y Registro): "campo" no se usa a proposito, no es un error.
+      'no-unused-vars': ['error', { ignoreRestSiblings: true }],
+    },
   },
 ])
