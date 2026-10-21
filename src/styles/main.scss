@@ -3006,3 +3006,57 @@ html[data-subrayar-enlaces] {
         text-align: right;
     }
 }
+
+/* ---------------- TODAS LAS ALERTAS ---------------- */
+// Mismo ancho y margenes que el Home (.content): las tarjetas aprovechan la pantalla.
+.alertas-wrap {
+    max-width: 78rem;
+
+    @media (min-width: 960px) {
+        padding: 2.25rem 1.5rem 3rem;
+    }
+
+    // En pantallas anchas la foto queda de ancho fijo y el texto usa el resto,
+    // asi la imagen no se agranda de mas y la descripcion tiene lugar.
+    @media (min-width: 900px) {
+        .alert-feature {
+            grid-template-columns: minmax(0, 1fr) 24rem;
+            gap: 1.5rem;
+            padding: 1.4rem 1.5rem;
+        }
+
+        .af-head h3 {
+            font-size: 1.25rem;
+        }
+
+        .af-desc {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+    }
+}
+
+.alertas-encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: .5rem 1rem;
+
+    .page-title {
+        margin-bottom: .35rem;
+    }
+
+    p {
+        margin: 0;
+        color: var(--texto-2);
+        font-size: .95rem;
+    }
+}
+
+.alertas-total {
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--texto-3);
+    white-space: nowrap;
+}

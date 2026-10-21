@@ -15,11 +15,20 @@ const Alertas = () => {
     );
 
     return (
-        <div className="page-wrap">
-            <h1 className="page-title">Todas las alertas</h1>
-            <p style={{ color: 'var(--texto-2)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
-                Alertas activas en Laboulaye. Filtrá por zona o por nivel de gravedad.
-            </p>
+        // Mismo ancho que el Home (.content), no el angosto de las paginas de formulario.
+        <div className="page-wrap alertas-wrap">
+            <div className="alertas-encabezado">
+                <div>
+                    <h1 className="page-title">Todas las alertas</h1>
+                    <p>Alertas activas en Laboulaye. Filtrá por zona o por nivel de gravedad.</p>
+                </div>
+                {!cargando && !error && (
+                    <span className="alertas-total">
+                        {alertasFiltradas.length} alerta{alertasFiltradas.length === 1 ? '' : 's'}
+                        {alertasFiltradas.length !== alertas.length && ` de ${alertas.length}`}
+                    </span>
+                )}
+            </div>
 
             <div className="filtros" role="group" aria-label="Filtrar alertas">
                 <select
