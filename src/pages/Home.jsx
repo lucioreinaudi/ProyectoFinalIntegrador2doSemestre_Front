@@ -6,6 +6,7 @@ import { selectEsMunicipio, selectEstaLogueado } from '../features/auth/authSlic
 import AlertsList from '../components/AlertsList';
 import ConsejosSeguridad from '../components/ConsejosSeguridad';
 import useAlertasActivas from '../features/alertas/useAlertasActivas';
+import { ORDENES, ordenarAlertas } from '../features/alertas/alertas';
 
 // Datos estáticos
 const CONTACTOS = [
@@ -29,6 +30,9 @@ const Home = () => {
     // Estados para los filtros
     const [filtroZona, setFiltroZona] = useState('todas');
     const [filtroNivel, setFiltroNivel] = useState('todos');
+    // Por defecto, lo mas nuevo arriba: asi una alerta recien publicada se ve enseguida
+    // aunque haya otras mas graves (y el Home muestra pocas por vez).
+    const [orden, setOrden] = useState('recientes');
 
     // Alertas reales del back (publicas, se ven sin login).
     const { alertas, zonas, cargando: cargandoAlertas, error: errorAlertas } = useAlertasActivas();
@@ -90,10 +94,10 @@ const Home = () => {
     });
 
     // Logica de filtrado
-    const alertasFiltradas = alertas.filter(a =>
+    const alertasFiltradas = ordenarAlertas(alertas.filter(a =>
         (filtroZona === 'todas' || a.zona === filtroZona) &&
         (filtroNivel === 'todos' || a.nivel === filtroNivel)
-    );
+    ), orden);
 
     return (
         <section className="view is-active" aria-labelledby="tit-inicio">
@@ -163,12 +167,19 @@ const Home = () => {
                             <button aria-pressed={filtroNivel === 'medio'} onClick={() => setFiltroNivel('medio')}>Medio</button>
                             <button aria-pressed={filtroNivel === 'bajo'} onClick={() => setFiltroNivel('bajo')}>Bajo</button>
                         </div>
+                        <select
+                            aria-label="Ordenar alertas"
+                            value={orden}
+                            onChange={(e) => setOrden(e.target.value)}
+                        >
+                            {ORDENES.map(o => <option key={o.valor} value={o.valor}>{o.label}</option>)}
+                        </select>
                     </div>
 
                     {/* Renderizamos el componente pasándole las alertas ya filtradas */}
-                    {/* De a 3: el Home es un vistazo rapido. El key reinicia "Mostrar mas" al cambiar un filtro */}
+                    {/* De a 3: el Home es un vistazo rapido. El key reinicia "Mostrar mas" al cambiar un filtro o el orden */}
                     <AlertsList
-                        key={`${filtroZona}-${filtroNivel}`}
+                        key={`${filtroZona}-${filtroNivel}-${orden}`}
                         alertas={alertasFiltradas}
                         cargando={cargandoAlertas}
                         error={errorAlertas}

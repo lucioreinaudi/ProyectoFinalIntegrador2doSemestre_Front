@@ -76,6 +76,19 @@ export function ordenarPorPrioridad(alertas) {
         new Date(b.fechaEmision) - new Date(a.fechaEmision))
 }
 
+// Ordenes que se pueden elegir en el Home.
+export const ORDENES = [
+    { valor: 'recientes', label: 'Más recientes' },
+    { valor: 'antiguas', label: 'Más antiguas' },
+    { valor: 'prioridad', label: 'Más graves primero' },
+]
+
+export function ordenarAlertas(alertas, orden) {
+    if (orden === 'prioridad') return ordenarPorPrioridad(alertas)
+    const signo = orden === 'antiguas' ? 1 : -1
+    return [...alertas].sort((a, b) => signo * (new Date(a.fechaEmision) - new Date(b.fechaEmision)))
+}
+
 // Datos vacios del formulario de alerta.
 export const ALERTA_VACIA = {
     titulo: '', descripcion: '', nivelGravedad: 'medio', tipo: 'otro', recomendaciones: '', zonaId: '', imagenUrl: null,
